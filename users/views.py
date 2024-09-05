@@ -1,22 +1,24 @@
 # users/views.py
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import user_passes_test
 from .forms import GroupForm
+from .forms import CustomUserCreationForm
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
+        
         if form.is_valid():
             user = form.save()
             auth_login(request, user)  # Loga o usuário automaticamente após o registro
             return redirect('profile')  # Redireciona para a página de perfil ou outra página
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 
 def login(request):
