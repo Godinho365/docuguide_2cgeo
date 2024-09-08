@@ -1,0 +1,79 @@
+{% extends 'users/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Criar Subcategoria{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12">
+            <!-- Card para criar nova subcategoria -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Criar Nova Subcategoria</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Campo de Seção -->
+                        <div class="form-group">
+                            <label for="{{ form.section.id_for_label }}">Seção</label>
+                            {{ form.section|add_class:"form-control" }}
+                            {{ form.section.errors }}
+                        </div>
+
+                        <!-- Campo de Categoria (vinculado à Seção) -->
+                        <div class="form-group">
+                            <label for="{{ form.category.id_for_label }}">Categoria</label>
+                            {{ form.category|add_class:"form-control" }}
+                            {{ form.category.errors }}
+                        </div>
+
+                        <!-- Campo de Nome da Subcategoria -->
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">Nome</label>
+                            {{ form.name|add_class:"form-control" }}
+                            {{ form.name.errors }}
+                        </div>
+
+                        <!-- Botão de submissão -->
+                        <button type="submit" class="btn btn-primary mt-3">Criar Subcategoria</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // AJAX para carregar categorias com base na seção selecionada
+        $('#id_section').on('change', function() {
+            var sectionId = $(this).val();
+            $.ajax({
+                url: "{% url 'ajax_load_categories' %}",
+                data: {
+                    'section_id': sectionId
+                },
+                success: function(data) {
+                    var $categorySelect = $('#id_category');
+                    $categorySelect.empty().append('<option value="">Selecione uma Categoria</option>');
+                    $.each(data, function(index, category) {
+                        $categorySelect.append($('<option>', {
+                            value: category.id,
+                            text: category.name
+                        }));
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

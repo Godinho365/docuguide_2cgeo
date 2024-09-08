@@ -1,40 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Grupo</title>
-    {% load static %}
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">2° CGEO</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' %}">Perfil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'list_groups' %}">Listar Grupos</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% extends "users/base.html" %}
 
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <h2>Editar Grupo</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        </form>
-    </div>
+{% block title %}Editar Grupo{% endblock %}
 
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Grupo</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    </form>
+</div>
+{% endblock %}

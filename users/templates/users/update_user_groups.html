@@ -1,0 +1,26 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Atualizar Grupos de {{ user.username }}</h2>
+
+    <form method="POST" action="{% url 'update_user_groups' user.id %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="groups" class="form-label">Grupos</label>
+            <select id="groups" name="groups" class="form-select" multiple>
+                {% for group in groups %}
+                    <option value="{{ group.id }}"
+                        {% if group in user.groups.all %}selected{% endif %}>
+                        {{ group.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">Selecione um ou mais grupos para o usuário.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{% url 'list_users_and_groups' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

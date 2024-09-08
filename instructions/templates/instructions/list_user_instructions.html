@@ -1,0 +1,136 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Minhas Instruções</h2>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-4 col-sm-12 mb-2">
+            <div class="form-group">
+                <label for="section-filter">Filtrar por Seção</label>
+                <select id="section-filter" class="form-control">
+                    <option value="">Todas as Seções</option>
+                    {% for section in sections %}
+                        <option value="{{ section.id }}" {% if request.GET.section == section.id|stringformat:"s" %}selected{% endif %}>{{ section.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12 mb-2">
+            <div class="form-group">
+                <label for="category-filter">Filtrar por Categoria</label>
+                <select id="category-filter" class="form-control">
+                    <option value="">Todas as Categorias</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12 mb-2">
+            <div class="form-group">
+                <label for="subcategory-filter">Filtrar por Subcategoria</label>
+                <select id="subcategory-filter" class="form-control">
+                    <option value="">Todas as Subcategorias</option>
+                    {% for subcategory in subcategories %}
+                        <option value="{{ subcategory.id }}" {% if request.GET.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Instruções em formato de cards -->
+    <div class="row">
+        {% for instruction in instructions %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'detail_instruction' instruction.id %}">{{ instruction.title }}</a>
+                    </h5>
+                    
+                    <p class="card-text"><strong>Criado em:</strong> {{ instruction.created_at }}</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'detail_instruction' instruction.id %}" class="btn btn-primary">Ver Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                Você ainda não criou nenhuma instrução.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Atualiza categorias e subcategorias com base na seção selecionada
+        $('#section-filter').on('change', function() {
+            var sectionId = $(this).val();
+            $.ajax({
+                url: "{% url 'ajax_load_categories' %}",
+                data: {
+                    'section_id': sectionId
+                },
+                success: function(data) {
+                    var $categorySelect = $('#category-filter');
+                    $categorySelect.empty().append('<option value="">Todas as Categorias</option>');
+                    $.each(data, function(index, category) {
+                        $categorySelect.append($('<option>', {
+                            value: category.id,
+                            text: category.name
+                        }));
+                    });
+                    // Limpar as subcategorias quando uma nova seção for selecionada
+                    $('#subcategory-filter').empty().append('<option value="">Todas as Subcategorias</option>');
+                }
+            });
+        });
+
+        $('#category-filter').on('change', function() {
+            var categoryId = $(this).val();
+            $.ajax({
+                url: "{% url 'ajax_load_subcategories' %}",
+                data: {
+                    'category_id': categoryId
+                },
+                success: function(data) {
+                    var $subcategorySelect = $('#subcategory-filter');
+                    $subcategorySelect.empty().append('<option value="">Todas as Subcategorias</option>');
+                    $.each(data, function(index, subcategory) {
+                        $subcategorySelect.append($('<option>', {
+                            value: subcategory.id,
+                            text: subcategory.name
+                        }));
+                    });
+                }
+            });
+        });
+
+        // Atualiza os filtros via URL
+        function updateFilters() {
+            var sectionId = $('#section-filter').val();
+            var categoryId = $('#category-filter').val();
+            var subcategoryId = $('#subcategory-filter').val();
+            var queryString = `?section=${sectionId}&category=${categoryId}&subcategory=${subcategoryId}`;
+            window.location.href = queryString;
+        }
+
+        // Adiciona listeners para atualizar filtros via URL
+        $('#section-filter').on('change', updateFilters);
+        $('#category-filter').on('change', updateFilters);
+        $('#subcategory-filter').on('change', updateFilters);
+    });
+</script>
+{% endblock %}

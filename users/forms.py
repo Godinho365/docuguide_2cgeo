@@ -1,4 +1,3 @@
-# users/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
@@ -26,3 +25,21 @@ class GroupForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do grupo'}),
         }
+
+class RedefinirEmailForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['email']
+
+    email = forms.EmailField(label='Novo e-mail', max_length=254)
+
+class UserGroupForm(forms.Form):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label='Select Users'
+    )
+    group = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        label='Select Group'
+    )
