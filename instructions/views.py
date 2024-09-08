@@ -48,7 +48,7 @@ def update_instruction(request, pk):
         form = InstructionForm(request.POST, instance=instruction)
         if form.is_valid():
             form.save()
-            return redirect('list_instructions')
+            return redirect('detail_instruction', pk=instruction.pk)
     else:
         form = InstructionForm(instance=instruction)
 

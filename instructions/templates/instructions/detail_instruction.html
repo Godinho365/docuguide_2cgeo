@@ -5,11 +5,12 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10 col-sm-12">
+        <!-- Ajusta o tamanho da coluna para ter uma largura maior -->
+        <div class="col-lg-10 col-md-12 col-sm-12">
             <!-- Card para mostrar os detalhes da instrução -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>{{ instruction.title }}</h2>
+            <div class="card" style="border-radius: 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">{{ instruction.title }}</h2>
                 </div>
                 <div class="card-body">
                     <p><strong>Seção:</strong> {{ instruction.section }}</p>
@@ -17,20 +18,22 @@
                     <p><strong>Subcategoria:</strong> {{ instruction.subcategory }}</p>
                     <p><strong>Autor:</strong> {{ instruction.author }}</p> <!-- Nome completo do autor -->
                     <p><strong>Data de criação:</strong> {{ instruction.created_at|date:"d/m/Y H:i" }}</p> <!-- Data formatada -->
-                    <div class="content">
+                    <div class="content mt-3">
                         <h4>Conteúdo</h4>
                         {{ instruction.content|safe }}
                     </div>
                 </div>
-                <div class="card-footer">
+                <div class="card-footer d-flex justify-content-between align-items-center">
                     <!-- Botão de edição visível apenas para superusuários ou o autor da instrução -->
                     {% if user.is_superuser or user == instruction.author %}
-                        <a href="{% url 'update_instruction' instruction.pk %}" class="btn btn-primary">Editar</a>
-                        <!-- Botão de deletar -->
-                        <form action="{% url 'delete_instruction' instruction.pk %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Deletar</button>
-                        </form>
+                        <div>
+                            <a href="{% url 'update_instruction' instruction.pk %}" class="btn btn-primary me-2">Editar</a>
+                            <!-- Botão de deletar -->
+                            <form action="{% url 'delete_instruction' instruction.pk %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Deletar</button>
+                            </form>
+                        </div>
                     {% endif %}
                     <a href="{% url 'list_instructions' %}" class="btn btn-secondary">Voltar à Lista</a>
                 </div>
