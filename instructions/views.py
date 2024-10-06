@@ -6,6 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
 
  #  INSTRUCTION
 @login_required
@@ -208,3 +212,112 @@ def ajax_load_subcategories(request):
         return JsonResponse(list(subcategories), safe=False)
     return JsonResponse([], safe=False)
 
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def update_order(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        
+        # Atualizar a ordem das seções
+        for index, section_id in enumerate(data.get('sections', [])):
+            Section.objects.filter(id=section_id).update(order=index)
+        
+        # Atualizar a ordem das categorias
+        for index, category_id in enumerate(data.get('categories', [])):
+            Category.objects.filter(id=category_id).update(order=index)
+        
+        # Atualizar a ordem das subcategorias
+        for index, subcategory_id in enumerate(data.get('subcategories', [])):
+            Subcategory.objects.filter(id=subcategory_id).update(order=index)
+        
+        # Atualizar a ordem das instruções (se aplicável)
+        for index, instruction_id in enumerate(data.get('instructions', [])):
+            Instruction.objects.filter(id=instruction_id).update(order=index)
+        
+        return JsonResponse({'status': 'success'})
+    
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+@csrf_exempt
+@require_POST
+def create_item(request):
+    try:
+        data = json.loads(request.body)
+        name = data.get('name')
+        item_type = data.get('type')  # 'section', 'category', or 'subcategory'
+        section_id = data.get('section_id')
+        category_id = data.get('category_id')
+
+        if item_type == 'section':
+            item = Section.objects.create(title=name)
+        elif item_type == 'category':
+            if not section_id:
+                return JsonResponse({'status': 'error', 'message': 'Section ID required'}, status=400)
+            item = Category.objects.create(name=name, section_id=section_id)
+        elif item_type == 'subcategory':
+            if not section_id or not category_id:
+                return JsonResponse({'status': 'error', 'message': 'Section ID and Category ID required'}, status=400)
+            item = Subcategory.objects.create(name=name, section_id=section_id, category_id=category_id)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid type'}, status=400)
+
+        return JsonResponse({'status': 'success', 'id': item.id})
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@csrf_exempt
+@require_POST
+def update_item(request):
+    try:
+        data = json.loads(request.body)
+        item_id = data.get('id')
+        new_name = data.get('name')
+        item_type = data.get('type')  # 'section', 'category', or 'subcategory'
+
+        if item_type == 'section':
+            item = Section.objects.get(id=item_id)
+            item.title = new_name
+        elif item_type == 'category':
+            item = Category.objects.get(id=item_id)
+            item.name = new_name
+        elif item_type == 'subcategory':
+            item = Subcategory.objects.get(id=item_id)
+            item.name = new_name
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid type'}, status=400)
+
+        item.save()
+        return JsonResponse({'status': 'success'})
+    except (Section.DoesNotExist, Category.DoesNotExist, Subcategory.DoesNotExist):
+        return JsonResponse({'status': 'error', 'message': 'Item not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
+@csrf_exempt
+@require_POST
+def delete_item(request):
+    try:
+        data = json.loads(request.body)
+        item_id = data.get('id')
+        item_type = data.get('type')  # 'section', 'category', or 'subcategory'
+
+        if item_type == 'section':
+            item = Section.objects.get(id=item_id)
+        elif item_type == 'category':
+            item = Category.objects.get(id=item_id)
+        elif item_type == 'subcategory':
+            item = Subcategory.objects.get(id=item_id)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid type'}, status=400)
+
+        item.delete()
+        return JsonResponse({'status': 'success'})
+    except (Section.DoesNotExist, Category.DoesNotExist, Subcategory.DoesNotExist):
+        return JsonResponse({'status': 'error', 'message': 'Item not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)

@@ -30,14 +30,22 @@ class Section(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='categories')
+    order = models.PositiveIntegerField(default=0)  # Novo campo para a ordem
+
+    class Meta:
+        ordering = ['order']
 
     def __str__(self):
         return self.name
 
 class Subcategory(models.Model):
-    name = models.CharField(max_length=100)  # Deve ser o campo correto
+    name = models.CharField(max_length=100)  
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='subcategories')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
+    order = models.PositiveIntegerField(default=0)  # Novo campo para a ordem
+
+    class Meta:
+        ordering = ['order']
 
     def __str__(self):
         return self.name

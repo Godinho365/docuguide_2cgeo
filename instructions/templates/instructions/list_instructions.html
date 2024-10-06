@@ -3,76 +3,85 @@
 {% block title %}Lista de Instruções{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="my-4">Lista de Instruções</h1>
-
-    <!-- Filtros -->
-    <div class="row mb-4">
-        <div class="col-md-4 col-sm-12 mb-2">
-            <div class="form-group">
-                <label for="section-filter">Filtrar por Seção</label>
-                <select id="section-filter" class="form-control">
-                    <option value="">Todas as Seções</option>
-                    {% for section in sections %}
-                        <option value="{{ section.id }}" {% if request.GET.section == section.id|stringformat:"s" %}selected{% endif %}>{{ section.title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-12 mb-2">
-            <div class="form-group">
-                <label for="category-filter">Filtrar por Categoria</label>
-                <select id="category-filter" class="form-control">
-                    <option value="">Todas as Categorias</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <div class="col-md-4 col-sm-12 mb-2">
-            <div class="form-group">
-                <label for="subcategory-filter">Filtrar por Subcategoria</label>
-                <select id="subcategory-filter" class="form-control">
-                    <option value="">Todas as Subcategorias</option>
-                    {% for subcategory in subcategories %}
-                        <option value="{{ subcategory.id }}" {% if request.GET.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lista de Instruções -->
+<div class="container-fluid">
     <div class="row">
-        {% for instruction in instructions %}
-        <div class="col-md-4 col-sm-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="{% url 'detail_instruction' instruction.pk %}">{{ instruction.title }}</a>
-                    </h5>
-                    <p class="card-text"><strong>Autor:</strong> {{ instruction.author }}</p>
+        <!-- Incluir a sidebar a partir do template 'estrutura_base_doc.html' -->
+        <nav class="col-md-3 sidebar">
+            {% include 'instructions/estrutura_base_doc.html' %}
+        </nav>
+        
+        <!-- Conteúdo principal ajustado para o layout com a sidebar -->
+        <main class="col-md-9 main-content" style="margin-top: 0px;">
+            <h1 class="my-4">Lista de Instruções</h1>
+
+            <!-- Filtros -->
+            <div class="row mb-4">
+                <div class="col-md-4 col-sm-12 mb-2">
+                    <div class="form-group">
+                        <label for="section-filter">Filtrar por Seção</label>
+                        <select id="section-filter" class="form-control">
+                            <option value="">Todas as Seções</option>
+                            {% for section in sections %}
+                                <option value="{{ section.id }}" {% if request.GET.section == section.id|stringformat:"s" %}selected{% endif %}>{{ section.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <a href="{% url 'detail_instruction' instruction.pk %}" class="btn btn-primary">Ver Detalhes</a>
+                <div class="col-md-4 col-sm-12 mb-2">
+                    <div class="form-group">
+                        <label for="category-filter">Filtrar por Categoria</label>
+                        <select id="category-filter" class="form-control">
+                            <option value="">Todas as Categorias</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 mb-2">
+                    <div class="form-group">
+                        <label for="subcategory-filter">Filtrar por Subcategoria</label>
+                        <select id="subcategory-filter" class="form-control">
+                            <option value="">Todas as Subcategorias</option>
+                            {% for subcategory in subcategories %}
+                                <option value="{{ subcategory.id }}" {% if request.GET.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info" role="alert">
-                Nenhuma instrução encontrada.
+
+            <!-- Lista de Instruções -->
+            <div class="row">
+                {% for instruction in instructions %}
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'detail_instruction' instruction.pk %}">{{ instruction.title }}</a>
+                            </h5>
+                            <p class="card-text"><strong>Autor:</strong> {{ instruction.author }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'detail_instruction' instruction.pk %}" class="btn btn-primary">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        Nenhuma instrução encontrada.
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-        </div>
-        {% endfor %}
+        </main>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
     $(document).ready(function() {
         // Atualiza categorias e subcategorias com base na seção selecionada
