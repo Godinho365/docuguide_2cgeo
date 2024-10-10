@@ -19,7 +19,7 @@ class Section(models.Model):
     title = models.CharField(max_length=255, unique=True)
     content = RichTextField(blank=True, null=True)  # Permite conteúdo vazio ou nulo
     order = models.PositiveIntegerField(default=0)
-    media = models.FileField(upload_to='media/', blank=True, null=True)
+    imagem = models.ImageField(upload_to='section_imagens/', blank=True, null=True)
 
     class Meta:
         ordering = ['order']

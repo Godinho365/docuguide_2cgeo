@@ -13,9 +13,10 @@ class InstructionForm(forms.ModelForm):
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
-        fields = ['title', 'media']
+        fields = ['title', 'imagem']
         widgets = {
-            'content': CKEditorWidget(),  # Usando CKEditorWidget para o campo 'content'
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o Nome'}),
+            'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 class CategoryForm(forms.ModelForm):

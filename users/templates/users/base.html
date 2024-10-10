@@ -42,6 +42,12 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"profile/" %}active{% endif %}" aria-current="page" href="{% url 'profile' %}">Perfil</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"documentation/" %}active{% endif %}" href="{% url 'list_sections' %}">Documentação</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"servers/" %}active{% endif %}" href="">Servidores</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"instructions/" %}active{% endif %}" href="#" id="instructionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Instruções
@@ -79,7 +85,7 @@
     {% if messages %}
     <div class="container mt-2">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
+        <div class="alert alert-{{ message.tags }} ">
             {{ message }}
         </div>
         {% endfor %}

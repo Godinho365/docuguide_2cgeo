@@ -16,18 +16,20 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
-                        <!-- Se o formulário tiver mídia, é necessário exibi-la -->
-                        
+                        <!-- Campo para o título da seção -->
                         <div class="form-group">
                             <label for="{{ form.title.id_for_label }}">Título</label>
                             {{ form.title|add_class:"form-control" }}
                             {{ form.title.errors }}
                         </div>
+
+                        <!-- Campo para o upload de imagem -->
                         <div class="form-group">
-                            <label for="{{ form.media.id_for_label }}">Capa</label>
-                            {{ form.media|add_class:"form-control" }}
-                            {{ form.media.errors }}
+                            <label for="{{ form.imagem.id_for_label }}">Capa</label>
+                            {{ form.imagem|add_class:"form-control" }}
+                            {{ form.imagem.errors }}
                         </div>
+
                         <button type="submit" class="btn btn-primary mt-3">Criar Seção</button>
                     </form>
                 </div>

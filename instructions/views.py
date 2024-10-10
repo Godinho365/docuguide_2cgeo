@@ -97,7 +97,7 @@ def detail_instruction(request, pk):
 
 def create_section(request):
     if request.method == 'POST':
-        form = SectionForm(request.POST)
+        form = SectionForm(request.POST, request.FILES)  # Inclua request.FILES para o upload de imagem
         if form.is_valid():
             # Verifica se já existe uma seção com o mesmo título
             title = form.cleaned_data.get('title')
@@ -108,7 +108,9 @@ def create_section(request):
                 return redirect('list_sections')  # Ajuste o redirecionamento conforme necessário
     else:
         form = SectionForm()
+    
     return render(request, 'instructions/create_section.html', {'form': form})
+
 
 def is_superuser(user):
     return user.is_superuser
@@ -148,17 +150,18 @@ def list_sections(request):
 
 # CATEGORIAS
 
-def list_categories(request):
-    categories = Category.objects.all()
-    return render(request, 'instructions/list_categories.html', {
-        'categories': categories,
-    })
+def list_categories(request, section_id):
+    # Verifica se a seção existe
+    section = get_object_or_404(Section, pk=section_id)
+    # Filtra as categorias associadas à seção
+    categories = Category.objects.filter(section=section)
+    return render(request, 'instructions/list_categories.html', {'section': section, 'categories': categories})
 
-def list_subcategories(request):
-    subcategories = Subcategory.objects.all()
-    return render(request, 'instructions/list_subcategories.html', {
-        'subcategories': subcategories,
-    })
+def list_subcategories(request, category_id):
+    # Obtenha a categoria usando o ID fornecido
+    category = get_object_or_404(Category, id=category_id)
+    subcategories = Subcategory.objects.filter(category=category)
+    return render(request, 'instructions/list_subcategories.html', {'subcategories': subcategories, 'category': category})
 
 
 def load_categories(request):
@@ -173,20 +176,56 @@ def load_subcategories(request):
 
 
 
-def create_category(request):
+def create_category(request, section_id=None):
+    section = None
+    if section_id:
+        section = get_object_or_404(Section, id=section_id)  # Obtém a seção se um ID for fornecido
+
     if request.method == 'POST':
         form = CategoryForm(request.POST)
         if form.is_valid():
-            # Verifica se já existe uma categoria com o mesmo nome
             name = form.cleaned_data.get('name')
+            # Verifica se já existe uma categoria com o mesmo nome
             if Category.objects.filter(name=name).exists():
                 form.add_error('name', 'Uma categoria com este nome já existe.')
             else:
-                form.save()
-                return redirect('create_instruction')  # Redirecione para uma página de sucesso ou lista de categorias
+                category = form.save(commit=False)  # Não salva ainda
+                if section:
+                    category.section = section  # Define a seção se existir
+                category.save()  # Agora salva a categoria
+                return redirect('list_categories_for_section', section_id=section.id)  # Redirecione para a lista de categorias da seção
     else:
         form = CategoryForm()
-    return render(request, 'instructions/create_category.html', {'form': form})
+
+    return render(request, 'instructions/create_category.html', {'form': form, 'section': section})
+
+def update_category(request, pk):
+    # Lógica para atualizar a categoria
+    category = get_object_or_404(Category, pk=pk)
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('list_categories_for_section', section_id=category.section.id)  # Redireciona para a lista de categorias da seção
+    else:
+        form = CategoryForm(instance=category)  # Preenche o formulário com os dados existentes da categoria
+
+    return render(request, 'instructions/update_categories.html', {'form': form, 'category': category})
+
+
+def delete_categories(request, category_id):
+    # Obtém a categoria ou retorna um 404 se não encontrada
+    category = get_object_or_404(Category, id=category_id)
+    
+    # Se o método da requisição for POST, exclua a categoria
+    if request.method == 'POST':
+        category.delete()
+        messages.success(request, 'Categoria excluída com sucesso!')
+        return redirect('list_categories', section_id=category.section.id)  # Redireciona para a lista de categorias da seção
+
+    # Se não for um POST, renderiza um template de confirmação
+    return render(request, 'instructions/list_categories.html', {'category': category})
 
 def create_subcategory(request):
     if request.method == 'POST':

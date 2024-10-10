@@ -4,39 +4,44 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Listar Seções</h5>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-center">
+                    <h5 class="card-title" style="text-transform: uppercase;">Seções</h5>
                 </div>
                 <div class="card-body">
                     <a href="{% url 'create_section' %}" class="btn btn-primary mb-3">Criar Nova Seção</a>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Título</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for section in sections %}
-                            <tr>
-                                <td>{{ section.id }}</td>
-                                <td>{{ section.title }}</td>
-                                <td>
-                                    <a href="{% url 'update_section' section.id %}" class="btn btn-warning btn-sm">Editar</a>
-                                    {% if user.is_superuser %}
-                                        <a href="{% url 'delete_section' section.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta seção?');">Excluir</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center">Nenhuma seção encontrada.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    
+                    <!-- Apresentação das seções como cards -->
+                    <div class="row">
+                        {% for section in sections %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card h-100 shadow-sm border-light">
+                                    <div class="card-img-container" style="height: 200px; display: flex; justify-content: center; align-items: center;">
+                                        <a href="{% url 'list_categories_for_section' section.id %}" style="display: block; width: 100%; height: 100%; text-align: center;">
+                                            {% if section.imagem %}
+                                                <img src="{{ section.imagem.url }}" class="card-img-top" alt="{{ section.title }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            {% else %}
+                                                <img src="https://via.placeholder.com/150.png?text=Sem+Imagem" class="card-img-top" alt="Imagem padrão" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title" style="text-transform: uppercase;">
+                                            <a href="{% url 'list_categories_for_section' section.id %}" style="text-decoration: none; color: inherit;">{{ section.title }}</a>
+                                        </h5>
+                                        <a href="{% url 'update_section' section.id %}" class="btn btn-warning btn-sm">Editar</a>
+                                        {% if user.is_superuser %}
+                                            <a href="{% url 'delete_section' section.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-md-12 text-center">
+                                <p>Nenhuma seção encontrada.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
