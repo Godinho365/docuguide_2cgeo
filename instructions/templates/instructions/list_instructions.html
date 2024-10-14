@@ -3,22 +3,19 @@
 {% block title %}Lista de Instruções{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
         <!-- Incluir a sidebar a partir do template 'estrutura_base_doc.html' -->
-        <nav class="col-md-3 sidebar">
-            {% include 'instructions/estrutura_base_doc.html' %}
-        </nav>
-        
+
         <!-- Conteúdo principal ajustado para o layout com a sidebar -->
-        <main class="col-md-9 main-content" style="margin-top: 0px;">
-            <h1 class="my-4">Lista de Instruções</h1>
+        <main class="col-lg-9 col-md-10 main-content">
+            <h1 class="text-center mb-4 text-uppercase" style="color: #2E8B57;">Instruções</h1>
 
             <!-- Filtros -->
-            <div class="row mb-4">
-                <div class="col-md-4 col-sm-12 mb-2">
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="section-filter">Filtrar por Seção</label>
+                        <label for="section-filter" class="font-weight-bold" style="color: #4B5320;">Filtrar por Seção</label>
                         <select id="section-filter" class="form-control">
                             <option value="">Todas as Seções</option>
                             {% for section in sections %}
@@ -27,9 +24,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-12 mb-2">
+                <div class="col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="category-filter">Filtrar por Categoria</label>
+                        <label for="category-filter" class="font-weight-bold" style="color: #4B5320;">Filtrar por Categoria</label>
                         <select id="category-filter" class="form-control">
                             <option value="">Todas as Categorias</option>
                             {% for category in categories %}
@@ -38,9 +35,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4 col-sm-12 mb-2">
+                <div class="col-md-4 col-sm-6">
                     <div class="form-group">
-                        <label for="subcategory-filter">Filtrar por Subcategoria</label>
+                        <label for="subcategory-filter" class="font-weight-bold" style="color: #4B5320;">Filtrar por Subcategoria</label>
                         <select id="subcategory-filter" class="form-control">
                             <option value="">Todas as Subcategorias</option>
                             {% for subcategory in subcategories %}
@@ -51,25 +48,34 @@
                 </div>
             </div>
 
+            <!-- Botão para criar uma nova instrução -->
+            <div class="text-center mb-4">
+                <a href="{% url 'create_instruction' %}" class="btn btn-outline-success btn-lg">
+                    Nova Instrução
+                </a>
+            </div>
+
             <!-- Lista de Instruções -->
-            <div class="row">
+            <div class="row justify-content-center">
                 {% for instruction in instructions %}
-                <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'detail_instruction' instruction.pk %}">{{ instruction.title }}</a>
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch">
+                    <div class="card border-dark w-100" style="background-color: #F5F5F5;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-center">
+                                <a href="{% url 'detail_instruction' instruction.pk %}" style="color: #2E8B57;">{{ instruction.title }}</a>
                             </h5>
-                            <p class="card-text"><strong>Autor:</strong> {{ instruction.author }}</p>
+                            <p class="card-text text-center"><strong>Autor:</strong> {{ instruction.author }}</p>
                         </div>
-                        <div class="card-footer">
-                            <a href="{% url 'detail_instruction' instruction.pk %}" class="btn btn-primary">Ver Detalhes</a>
+                        <div class="card-footer mt-auto text-center">
+                            <a href="{% url 'detail_instruction' instruction.pk %}" class="btn btn-success" style="background-color: #4B5320; color: white;">
+                                Ver Detalhes
+                            </a>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info text-center" role="alert">
                         Nenhuma instrução encontrada.
                     </div>
                 </div>
@@ -101,7 +107,6 @@
                             text: category.name
                         }));
                     });
-                    // Limpar as subcategorias quando uma nova seção for selecionada
                     $('#subcategory-filter').empty().append('<option value="">Todas as Subcategorias</option>');
                 }
             });
@@ -136,10 +141,7 @@
             window.location.href = queryString;
         }
 
-        // Adiciona listeners para atualizar filtros via URL
-        $('#section-filter').on('change', updateFilters);
-        $('#category-filter').on('change', updateFilters);
-        $('#subcategory-filter').on('change', updateFilters);
+        $('#section-filter, #category-filter, #subcategory-filter').on('change', updateFilters);
     });
 </script>
 {% endblock %}

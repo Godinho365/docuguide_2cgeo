@@ -12,6 +12,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/users/login/', permanent=False)),  # Redireciona para a página de login
     path('instructions/', include('instructions.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),  # URLs do CKEditor
+    path('tasks/', include('tasks.urls')),
 ]
 
 # Adiciona suporte para arquivos de mídia em desenvolvimento

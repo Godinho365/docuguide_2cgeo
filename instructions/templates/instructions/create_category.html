@@ -4,18 +4,59 @@
 {% block title %}Criar Categoria{% endblock %}
 
 {% block content %}
+<style>
+    /* Estilos gerais */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9; /* Cor de fundo suave */
+    }
+
+    /* Estilos do card */
+    .card {
+        border-radius: 0.5rem; /* Bordas arredondadas */
+        background-color: #ffffff; /* Fundo branco para o card */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    }
+
+    /* Estilos do cabeçalho do card */
+    .card-header {
+        background-color: #007bff; /* Azul padrão do Bootstrap */
+        color: #ffffff; /* Texto branco */
+        border-top-left-radius: 0.5rem; /* Bordas arredondadas */
+        border-top-right-radius: 0.5rem; /* Bordas arredondadas */
+    }
+
+    /* Estilos do botão */
+    .btn-primary {
+        background-color: #28a745; /* Verde claro */
+        border-color: #28a745; /* Cor da borda */
+    }
+
+    /* Estilos de hover do botão */
+    .btn-primary:hover {
+        background-color: #218838; /* Verde mais escuro no hover */
+        border-color: #1e7e34; /* Cor da borda mais escura no hover */
+    }
+
+    /* Títulos */
+    .text-uppercase {
+        text-transform: uppercase; /* Texto em maiúsculas */
+    }
+</style>
+
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10 col-sm-12">
             <!-- Card para criar nova categoria -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Criar Nova Categoria</h2>
+            <div class="card shadow-sm border-light">
+                <div class="card-header text-center">
+                    <h2 class="text-uppercase mb-0">Criar Nova Categoria</h2>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form.media }}
+                        
+                        <input type="hidden" name="section_id" value="{{ section.id }}">
                         
                         <div class="form-group">
                             <label for="{{ form.name.id_for_label }}">Nome</label>
@@ -27,7 +68,14 @@
                             {{ form.section|add_class:"form-control" }}
                             {{ form.section.errors }}
                         </div>
-                        <button type="submit" class="btn btn-primary mt-3">Criar Categoria</button>
+
+                        <div class="form-group">
+                            <label for="{{ form.imagem.id_for_label }}">Capa</label>
+                            {{ form.imagem|add_class:"form-control" }}
+                            {{ form.imagem.errors }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mt-3">Criar Categoria</button>
                     </form>
                 </div>
             </div>

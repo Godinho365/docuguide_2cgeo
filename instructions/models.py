@@ -31,6 +31,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='categories')
     order = models.PositiveIntegerField(default=0)  # Novo campo para a ordem
+    imagem = models.ImageField(upload_to='categories_imagens/', blank=True, null=True)
 
     class Meta:
         ordering = ['order']
@@ -43,6 +44,7 @@ class Subcategory(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='subcategories')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
     order = models.PositiveIntegerField(default=0)  # Novo campo para a ordem
+    imagem = models.ImageField(upload_to='subcategory_imagens/', blank=True, null=True)
 
     class Meta:
         ordering = ['order']

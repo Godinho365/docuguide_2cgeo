@@ -4,18 +4,16 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header text-center">
-                    <h5 class="card-title" style="text-transform: uppercase;">Seções</h5>
+            <div class="card mb-4" style="border: 2px solid #4B8C2A; border-radius: 15px; background-color: #F8F9FA;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #4B8C2A; color: white;">
+                    <h5 class="card-title text-center" style="text-transform: uppercase; margin: 0;">Seções</h5>
+                    <button class="btn btn-primary" style="background-color: #006400; border-color: #4B8C2A;" data-bs-toggle="modal" data-bs-target="#createSectionModal">Nova Seção</button>
                 </div>
                 <div class="card-body">
-                    <a href="{% url 'create_section' %}" class="btn btn-primary mb-3">Criar Nova Seção</a>
-                    
-                    <!-- Apresentação das seções como cards -->
                     <div class="row">
                         {% for section in sections %}
                             <div class="col-md-4 mb-4">
-                                <div class="card h-100 shadow-sm border-light">
+                                <div class="card h-100 shadow-sm border-light section-card" style="border: 1px solid #4B8C2A;">
                                     <div class="card-img-container" style="height: 200px; display: flex; justify-content: center; align-items: center;">
                                         <a href="{% url 'list_categories_for_section' section.id %}" style="display: block; width: 100%; height: 100%; text-align: center;">
                                             {% if section.imagem %}
@@ -29,13 +27,72 @@
                                         <h5 class="card-title" style="text-transform: uppercase;">
                                             <a href="{% url 'list_categories_for_section' section.id %}" style="text-decoration: none; color: inherit;">{{ section.title }}</a>
                                         </h5>
-                                        <a href="{% url 'update_section' section.id %}" class="btn btn-warning btn-sm">Editar</a>
-                                        {% if user.is_superuser %}
-                                            <a href="{% url 'delete_section' section.id %}" class="btn btn-danger btn-sm">Excluir</a>
-                                        {% endif %}
+                                        <div class="d-flex justify-content-center">
+                                            {% if user.is_superuser %}
+                                            <button class="btn btn-sm" style="background-color: #28A745; color: white; border: none; margin-right: 5px;" data-bs-toggle="modal" data-bs-target="#editModal{{ section.id }}">Editar</button>
+                                            <button class="btn btn-sm" style="background-color: #FF851B; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#deleteModal{{ section.id }}">Excluir</button>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Modal para Edição -->
+                            <div class="modal fade" id="editModal{{ section.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ section.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel{{ section.id }}">Editar Seção</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{% url 'update_section' section.id %}" method="post" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+                                                    <label for="title" class="form-label">Título</label>
+                                                    <input type="text" class="form-control" id="title" name="title" value="{{ section.title }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="imagem" class="form-label">Imagem</label>
+                                                    <input type="file" class="form-control" id="imagem" name="imagem">
+                                                    <small class="form-text text-muted">
+                                                        Imagem atual: 
+                                                        {% if section.imagem %}
+                                                            <img src="{{ section.imagem.url }}" style="max-width: 100px;">
+                                                        {% else %}
+                                                            Nenhuma imagem associada.
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Salvar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal para Exclusão -->
+                            <div class="modal fade" id="deleteModal{{ section.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ section.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ section.id }}">Excluir Seção</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Tem certeza de que deseja excluir a seção "{{ section.title }}"?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form action="{% url 'delete_section' section.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-danger">Excluir</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         {% empty %}
                             <div class="col-md-12 text-center">
                                 <p>Nenhuma seção encontrada.</p>
@@ -47,4 +104,60 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para Criar Nova Seção -->
+<div class="modal fade" id="createSectionModal" tabindex="-1" aria-labelledby="createSectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSectionModalLabel">Nova Seção</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'create_section' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="imagem" class="form-label">Imagem</label>
+                        <input type="file" class="form-control" id="imagem" name="imagem">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Criar Seção</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS Adicional -->
+<style>
+    .section-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .section-card:hover {
+        transform: translateY(-5px); /* Move o card para cima */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Adiciona sombra ao card */
+    }
+
+    .card-img-top {
+        transition: transform 0.2s;
+    }
+
+    .section-card:hover .card-img-top {
+        transform: scale(1.05); /* Aumenta ligeiramente a imagem ao passar o mouse */
+    }
+
+    .btn {
+        transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #0056b3; /* Cor mais escura para os botões ao passar o mouse */
+    }
+</style>
+
 {% endblock %}

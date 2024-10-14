@@ -1,0 +1,43 @@
+{% extends "users/base.html" %}
+
+{% block title %}Lista de Servidores{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header text-center" style="background-color: #4B8C2A; color: white;">
+                    <h5 class="card-title" style="text-transform: uppercase;">Lista de Servidores</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nome</th>
+                                <th scope="col">IP</th>
+                                <th scope="col">Usuário</th>
+                                <th scope="col">Senha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for server in servers %}
+                            <tr>
+                                <td>{{ server.name }}</td>
+                                <td>{{ server.ip }}</td>
+                                <td>{{ server.username }}</td>
+                                <td>{{ server.password }}</td> <!-- Use this with caution -->
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">Nenhum servidor encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

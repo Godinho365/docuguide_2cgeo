@@ -4,13 +4,70 @@
 {% block title %}Criar Instrução{% endblock %}
 
 {% block content %}
+<style>
+    /* Estilos gerais */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #e5e5e5; /* Cor de fundo suave */
+    }
+
+    /* Estilos do card */
+    .card {
+        border-radius: 0.5rem; /* Bordas arredondadas */
+        background-color: #ffffff; /* Fundo branco para o card */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Sombra leve */
+    }
+
+    /* Estilos do cabeçalho do card */
+    .card-header {
+        background-color: #4b8b3b; /* Verde militar */
+        color: #ffffff; /* Texto branco */
+        border-top-left-radius: 0.5rem; /* Bordas arredondadas */
+        border-top-right-radius: 0.5rem; /* Bordas arredondadas */
+    }
+
+    /* Estilos do botão */
+    .btn-primary {
+        background-color: #28a745; /* Verde claro */
+        border-color: #28a745; /* Cor da borda */
+    }
+
+    /* Estilos de hover do botão */
+    .btn-primary:hover {
+        background-color: #218838; /* Verde mais escuro no hover */
+        border-color: #1e7e34; /* Cor da borda mais escura no hover */
+    }
+
+    .btn-secondary {
+        background-color: #6c757d; /* Cinza para botões secundários */
+        border-color: #6c757d; /* Cor da borda */
+    }
+
+    /* Estilos de hover do botão secundário */
+    .btn-secondary:hover {
+        background-color: #5a6268; /* Cinza mais escuro no hover */
+        border-color: #545b62; /* Cor da borda mais escura no hover */
+    }
+
+    /* Títulos */
+    .text-uppercase {
+        text-transform: uppercase; /* Texto em maiúsculas */
+    }
+
+    /* Estilo do label */
+    label {
+        font-weight: bold; /* Negrito para os rótulos */
+        color: #333; /* Cor escura para contraste */
+    }
+</style>
+
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10 col-sm-12">
             <!-- Card para criar nova instrução -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Criar Nova Instrução</h2>
+            <div class="card shadow-sm border-light">
+                <div class="card-header text-center">
+                    <h2 class="text-uppercase mb-0">Nova Instrução</h2>
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
@@ -56,7 +113,7 @@
                         </div>
 
                         <!-- Botão de submissão -->
-                        <button type="submit" class="btn btn-primary">Criar Instrução</button>
+                        <button type="submit" class="btn btn-primary btn-block mt-3">Criar Instrução</button>
                     </form>
                 </div>
             </div>
@@ -67,7 +124,6 @@
 
 {% block extra_js %}
 {% load static %}
-
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

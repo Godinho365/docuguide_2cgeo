@@ -1,0 +1,33 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header text-white" style="background-color: #4B8C2A;">
+            <h2 class="mb-0">{{ task.title }}</h2>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Detalhes da Tarefa</h5>
+            <p class="card-text"><strong>Delegante:</strong> {{ task.creator.username }}</p>
+            <p class="card-text"><strong>Responsável:</strong> {{ task.assignee.username }}</p>
+            <p class="card-text"><strong>Atividade:</strong> {{ task.description }}</p> <!-- Adicionando a descrição -->
+            <p class="card-text"><strong>Data de Início:</strong> {{ task.start_date|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Data de Vencimento:</strong> {{ task.due_date|date:"d/m/Y H:i" }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ task.get_status_display }}</p>
+            
+            {% if task.observation %}
+                <p class="card-text"><strong>Observação do Responsável :</strong> {{ task.observation }}</p>
+            {% endif %}
+            {% if task.file_attachment %}
+                <p class="card-text"><strong>Anexo:</strong> <a href="{{ task.file_attachment.url }}" target="_blank" class="btn btn-link">Ver Anexo</a></p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'task_list' %}" class="btn btn-secondary">Voltar</a>
+            {% if request.user == task.assignee %}
+                <a href="{% url 'update_task_assigne' task.id %}" class="btn btn-primary">Atualizar</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

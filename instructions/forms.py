@@ -22,17 +22,19 @@ class SectionForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['name', 'section']  # Inclua apenas os campos que existem no modelo
+        fields = ['name','section','imagem']  # Inclua apenas os campos que existem no modelo
         widgets = {
             'section': forms.Select(attrs={'class': 'form-control'}),
+            'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 class SubcategoryForm(forms.ModelForm):
     class Meta:
         model = Subcategory
-        fields = ['name', 'category', 'section']  # Campos ajustados conforme o modelo Subcategory
+        fields = ['name', 'category', 'section', 'imagem']  # Campos ajustados conforme o modelo Subcategory
         widgets = {
             'section': forms.Select(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
+            'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
 
         }

@@ -4,25 +4,39 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header text-center">
-                    <h5 class="card-title" style="text-transform: uppercase;">Subcategorias da(o) {{ category.name }}</h5>
+            <div class="card mb-4" style="border: 2px solid #4B8C2A; border-radius: 15px; background-color: #F8F9FA;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #4B8C2A; color: white;">
+                    <h5 class="card-title" style="text-transform: uppercase; margin: 0;">Subcategorias da(o) {{ category.name }}</h5>
+                    <a href="{% url 'create_subcategory' %}" class="btn btn-primary" style="background-color: #006400; border-color: #4B8C2A;">Criar Nova Subcategoria</a>
                 </div>
                 <div class="card-body">
-                    <a href="{% url 'create_subcategory' %}" class="btn btn-primary mb-3">Criar Nova Subcategoria</a>
-
                     <!-- Apresentação das subcategorias como cards -->
                     <div class="row">
                         {% for subcategory in subcategories %}
                             <div class="col-md-4 mb-4">
-                                <div class="card h-100 shadow-sm border-light">
+                                <div class="card h-100 shadow-sm border-light" style="border: 1px solid #4B8C2A;">
+                                    <div class="card-img-container" style="height: 200px; display: flex; justify-content: center; align-items: center;">
+                                        <a href="{% url 'list_instructions_for_subcategory' subcategory.id %}" style="display: block; width: 100%; height: 100%; text-align: center;">
+                                            {% if subcategory.imagem %}  <!-- Supondo que o modelo Subcategory tenha um campo imagem -->
+                                                <img src="{{ subcategory.imagem.url }}" class="card-img-top" alt="{{ subcategory.name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            {% else %}
+                                                <img src="https://via.placeholder.com/150.png?text=Sem+Imagem" class="card-img-top" alt="Imagem padrão" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                            {% endif %}
+                                        </a>
+                                    </div>
                                     <div class="card-body text-center">
                                         <h5 class="card-title" style="text-transform: uppercase;">
-                                            {{ subcategory.name }}
+                                            <a href="{% url 'list_instructions_for_subcategory' subcategory.id %}" style="text-decoration: none; color: inherit;">{{ subcategory.name }}</a>
                                         </h5>
                                         <p class="card-text">Categoria: {{ subcategory.category.name }}</p>
                                         <p class="card-text">Seção: {{ subcategory.category.section.title }}</p>
-                                       
+                                        <div class="d-flex justify-content-center">
+                                            {% if user.is_superuser %}
+                                            <a href="{% url 'update_subcategory' subcategory.id %}" class="btn btn-sm" style="background-color: #28A745; color: white; border: none; margin-right: 5px;">Editar</a>
+                                            
+                                                <a href="{% url 'delete_subcategory' subcategory.id %}" class="btn btn-sm" style="background-color: #FF851B; color: white; border: none;">Excluir</a>
+                                            {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

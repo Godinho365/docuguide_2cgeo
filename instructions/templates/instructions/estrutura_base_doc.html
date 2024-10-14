@@ -4,141 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Documentação{% endblock %}</title>
+    
+    <!-- Link para Bootstrap e Google Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Estilos adicionais para a sidebar fixa */
+        /* Estilo Global */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+        }
+        
+        /* Cabeçalho */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 500;
+            color: #3e5641; /* Verde militar */
+        }
+        
+        /* Sidebar Estilizada */
         .sidebar {
             position: fixed;
-            top: 60px; /* Ajusta a posição para baixo do cabeçalho */
+            top: 60px;
             left: 0;
-            height: calc(100% - 60px); /* Ajusta a altura para não cobrir o cabeçalho */
+            height: calc(100% - 60px);
+            max-width: 320px;
             width: 100%;
-            max-width: 400px; /* Largura máxima da sidebar */
-            background-color: #ffffff; /* Fundo branco */
+            background-color: #ffffff;
             padding: 20px;
-            border-right: 1px solid #eaeaea; /* Borda direita */
+            border-right: 1px solid #dee2e6;
             overflow-y: auto;
-            z-index: 1000; /* Garante que a sidebar fique acima do conteúdo */
-            transition: width 0.3s; /* Transição suave para a largura */
+            transition: all 0.3s;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
-
+        
         @media (max-width: 768px) {
             .sidebar {
                 position: static;
                 width: 100%;
                 height: auto;
-                border-right: none; /* Remove a borda direita em telas pequenas */
+                box-shadow: none;
+                border-right: none;
             }
         }
-
+        
         .sidebar h5 {
-            padding-left: 15px;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
         }
-
+        
+        /* Alterar cor dos links */
         .sidebar .nav-link {
-            padding: 10px 15px;
-            position: relative;
-            display: flex;
-            justify-content: space-between; /* Alinha botões à direita */
+            padding: 0.75rem 1rem;
+            color: #3e5641; /* Verde militar */
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-
-        /* Estilo para setas diferentes */
-        .sidebar .nav-link.category::after {
-            content: '\25BC'; /* Símbolo da seta para baixo para categorias */
-            font-size: 0.75rem;
-            position: absolute;
-            right: -10px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: transform 0.3s;
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: #dfe5e1; /* Cor clara para hover */
+            color: #2b3d32; /* Verde militar mais escuro */
         }
-
-        .sidebar .nav-link.category.collapsed::after {
-            content: '\25B6'; /* Símbolo da seta para a direita para categorias */
-            right: -10px;
+        
+        /* Ícones ajustados */
+        .fa-book {
+            margin-right: 8px;
+            color: #6c757d;
         }
-
-        .sidebar .nav-link.subcategory::after {
-            content: '\25BC'; /* Símbolo da seta para baixo para subcategorias */
-            font-size: 0.75rem;
-            position: absolute;
-            right: -10px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: transform 0.3s;
+        
+        /* Ajuste das setas */
+        .sidebar .nav-link::after {
+            transition: transform 0.3s ease;
         }
-
-        .sidebar .nav-link.subcategory.collapsed::after {
-            content: '\25BC'; /* Símbolo da seta para baixo para subcategorias */
-            right: -10px;
+        
+        .sidebar .nav-link.collapsed::after {
+            transform: rotate(-90deg);
         }
-
-        .sidebar .nav-link.instruction::after {
-            content: ''; /* Sem símbolo para instruções */
-        }
-
-        .sidebar .nav-link.active {
-            background-color: #f8f9fa; /* Fundo claro para itens ativos */
-            font-weight: bold;
-        }
-
+        
+        /* Estilo de conteúdo principal */
         .main-content {
-            margin-left: 0; /* Remove a margem esquerda padrão em telas pequenas */
+            margin-left: 0;
             padding: 20px;
+            background-color: #f4f7f9;
         }
-
+        
         @media (min-width: 769px) {
             .main-content {
-                margin-left: 250px; /* Largura da sidebar */
+                margin-left: 320px;
             }
         }
-
-        /* Recuo para instruções dentro de subcategorias */
-        .instructions-list {
-            padding-left: 30px; /* Adiciona um recuo adicional para instruções */
+        
+        /* Melhorias em formulários */
+        #formContainer {
+            margin-top: 20px;
         }
+        
+        /* Responsividade geral */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+        }
+        
+        /* Botões de ação */
+        .btn-primary {
+            background-color: #3e5641; /* Verde militar */
+            border-color: #3e5641;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2b3d32; /* Verde militar mais escuro */
+            border-color: #2b3d32;
+        }
+        
     </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar com navegação expansível (Accordion) -->
+            <!-- Sidebar com navegação expansível -->
             <nav class="sidebar">
                 {% block sidebar %}
-                <h5></h5>
+                <h5>Navegação</h5>
                 <div class="accordion" id="accordionExample">
                     {% for section in sections %}
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading{{ section.id }}">
-                            <button class="accordion-button{% if section.is_active %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ section.id }}" aria-expanded="{% if section.is_active %}true{% else %}false{% endif %}" aria-controls="collapse{{ section.id }}">
+                            <button class="accordion-button {% if not section.is_active %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ section.id }}" aria-expanded="{% if section.is_active %}true{% else %}false{% endif %}" aria-controls="collapse{{ section.id }}">
                                 {{ section.title }}
                             </button>
                         </h2>
-                        <div id="collapse{{ section.id }}" class="accordion-collapse collapse{% if section.is_active %} show{% endif %}" aria-labelledby="heading{{ section.id }}" data-bs-parent="#accordionExample">
+                        <div id="collapse{{ section.id }}" class="accordion-collapse collapse {% if section.is_active %}show{% endif %}" aria-labelledby="heading{{ section.id }}" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
                                 <ul id="section{{ section.id }}" class="nav flex-column">
                                     {% for category in section.categories.all %}
                                     <li class="nav-item" data-id="{{ category.id }}">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <a class="nav-link category{% if category.is_active %} active{% endif %}" data-bs-toggle="collapse" href="#collapseCategory{{ category.id }}" role="button" aria-expanded="false" aria-controls="collapseCategory{{ category.id }}">
-                                                {{ category.name }}
-                                            </a>
-                                        </div>
+                                        <a class="nav-link category {% if category.is_active %}active{% endif %}" data-bs-toggle="collapse" href="#collapseCategory{{ category.id }}" role="button" aria-expanded="false" aria-controls="collapseCategory{{ category.id }}">
+                                            {{ category.name }}
+                                        </a>
                                         <div id="collapseCategory{{ category.id }}" class="collapse">
                                             <ul id="category{{ category.id }}" class="nav flex-column ms-3">
                                                 {% for subcategory in category.subcategories.all %}
                                                 <li class="nav-item" data-id="{{ subcategory.id }}">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <a class="nav-link subcategory{% if subcategory.is_active %} active{% endif %}" data-bs-toggle="collapse" href="#collapseSubcategory{{ subcategory.id }}" role="button" aria-expanded="false" aria-controls="collapseSubcategory{{ subcategory.id }}">
-                                                            {{ subcategory.name }}
-                                                        </a>
-                                                    </div>
+                                                    <a class="nav-link subcategory {% if subcategory.is_active %}active{% endif %}" data-bs-toggle="collapse" href="#collapseSubcategory{{ subcategory.id }}" role="button" aria-expanded="false" aria-controls="collapseSubcategory{{ subcategory.id }}">
+                                                        {{ subcategory.name }}
+                                                    </a>
                                                     <div id="collapseSubcategory{{ subcategory.id }}" class="collapse">
                                                         <ul id="subcategory{{ subcategory.id }}" class="nav flex-column ms-3 instructions-list">
                                                             {% for instruction in subcategory.instructions.all %}
                                                             <li class="nav-item" data-id="{{ instruction.id }}">
-                                                                <i class="fa fa-book"></i> <!-- Ícone de livro -->
+                                                                <i class="fa fa-book"></i>
                                                                 <a class="nav-link instruction" href="{% url 'detail_instruction' instruction.id %}">
                                                                     {{ instruction.title }}
                                                                 </a>
@@ -160,89 +178,20 @@
                 </div>
                 {% endblock %}
             </nav>
+
             <!-- Conteúdo Principal -->
             <main class="main-content">
                 {% block content %}{% endblock %}
-                <!-- Formulários de criação, edição e exclusão -->
                 <div id="formContainer"></div>
             </main>
         </div>
     </div>
 
-    <!-- Inclusão do Bootstrap JS -->
+    <!-- Inclusão do Bootstrap JS e Sortable.js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            function getOrderData(selector) {
-                return Array.from(document.querySelectorAll(selector)).map(function (item) {
-                    return item.getAttribute('data-id');
-                });
-            }
-        
-            // Ativar Sortable.js para seções, categorias e subcategorias
-            var sections = document.querySelectorAll('.nav');
-            sections.forEach(function (section) {
-                Sortable.create(section, {
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
-                    dragClass: 'sortable-drag',
-                    onEnd: function (evt) {
-                        // Captura a ordem dos itens
-                        var sectionItems = getOrderData('#' + evt.from.id);
-                        var categoryItems = getOrderData('#' + evt.from.id + ' .nav');
-                        var subcategoryItems = getOrderData('#' + evt.from.id + ' .nav .nav');
-        
-                        // Enviar a nova ordem para o backend
-                        fetch('/update-order/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            body: JSON.stringify({
-                                sections: sectionItems,
-                                categories: categoryItems,
-                                subcategories: subcategoryItems
-                            })
-                        }).then(response => response.json())
-                          .then(data => {
-                              if (data.status === 'success') {
-                                  console.log('Ordem atualizada com sucesso');
-                              } else {
-                                  console.error('Erro ao atualizar ordem:', data);
-                              }
-                          }).catch(error => {
-                              console.error('Erro na solicitação fetch:', error);
-                          });
-                    }
-                });
-            });
-        });
-
-        // Função para obter o CSRF token dos cookies
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !==
-            // Função para obter o CSRF token dos cookies
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-        });
-    </script>
+  
 
     {% block extra_js %}{% endblock %}
 </body>

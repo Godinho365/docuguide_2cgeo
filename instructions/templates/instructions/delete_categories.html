@@ -1,0 +1,43 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<style>
+    /* Estilos gerais */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9; /* Cor de fundo suave */
+    }
+
+    /* Estilo do título */
+    h2 {
+        color: #dc3545; /* Vermelho padrão do Bootstrap para alertas */
+    }
+
+    /* Estilo do card */
+    .alert {
+        border-radius: 0.5rem; /* Bordas arredondadas */
+        margin-bottom: 1rem; /* Espaço inferior */
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            {% if messages %}
+                <div class="alert alert-info">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <h2>Confirmar Exclusão</h2>
+            <p>Tem certeza de que deseja excluir a categoria "{{ category.name }}"?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Excluir</button>
+                <a href="{% url 'list_categories_for_section' category.section.id %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

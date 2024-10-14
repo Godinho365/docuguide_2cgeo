@@ -1,0 +1,180 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-5">Painel de Tarefas</h2>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs justify-content-center mb-4" id="myTab" role="tablist" style="border-radius: 5px;">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="created-tasks-tab" data-bs-toggle="tab" href="#created-tasks" role="tab" aria-controls="created-tasks" aria-selected="true">
+                Tarefas Delegadas
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="assigned-tasks-tab" data-bs-toggle="tab" href="#assigned-tasks" role="tab" aria-controls="assigned-tasks" aria-selected="false">
+                Minhas Tarefas
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="myTabContent">
+        <!-- Tarefas Criadas -->
+        <div class="tab-pane fade show active" id="created-tasks" role="tabpanel" aria-labelledby="created-tasks-tab">
+            <!-- Formulário de filtro -->
+            <form method="get" class="mb-4">
+                <div class="row align-items-end">
+                    <div class="col-md-4 mb-3">
+                        <select name="status" class="form-control">
+                            <option value="">Filtrar por status</option>
+                            <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pendente</option>
+                            <option value="in_progress" {% if request.GET.status == "in_progress" %}selected{% endif %}>Em Progresso</option>
+                            <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Concluída</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="start_date" class="form-label">Data de Início:</label>
+                        <input type="date" name="start_date" class="form-control" id="start_date" value="{{ request.GET.start_date }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="due_date" class="form-label">Data de Vencimento:</label>
+                        <input type="date" name="due_date" class="form-control" id="due_date" value="{{ request.GET.due_date }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                        <a href="{% url 'task_list' %}" class="btn btn-secondary">Limpar Filtros</a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Listagem de Tarefas Criadas -->
+            <div class="row justify-content-center">
+                {% for task in created_tasks %}
+                    <div class="col-md-4 mb-4">
+                        {% if task.status == 'pending' %}
+                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #FFA500; border-radius: 15px; background-color: #FFF8E1;"> <!-- Laranja -->
+                        {% elif task.status == 'in_progress' %}
+                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #007BFF; border-radius: 15px; background-color: #D1ECF1;"> <!-- Azul -->
+                        {% elif task.status == 'completed' %}
+                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #28A745; border-radius: 15px; background-color: #D4EDDA;"> <!-- Verde -->
+                        {% endif %}
+                            <div class="card-header" style="background-color: #4B8C2A; color: white;">
+                                <h5 class="card-title mb-0" style="text-transform: uppercase;">{{ task.title }}</h5>
+                                <small>Status: {{ task.get_status_display }}</small>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Data de Início:</strong> {{ task.start_date|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Data de Vencimento:</strong> {{ task.due_date|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Responsável:</strong> {{ task.assignee.username }}</p>
+                                {% if task.file_attachment %}
+                                    <a href="{{ task.file_attachment.url }}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank">Ver Anexo</a>
+                                {% endif %}
+                                <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-primary mt-2">Ver</a> <!-- Botão Ver -->
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">Nenhuma tarefa encontrada com os filtros aplicados.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Tarefas Delegadas -->
+        <div class="tab-pane fade" id="assigned-tasks" role="tabpanel" aria-labelledby="assigned-tasks-tab">
+            <!-- Formulário de filtro -->
+            <form method="get" class="mb-4">
+                <div class="row align-items-end">
+                    <div class="col-md-4 mb-3">
+                        <select name="status" class="form-control">
+                            <option value="">Filtrar por status</option>
+                            <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pendente</option>
+                            <option value="in_progress" {% if request.GET.status == "in_progress" %}selected{% endif %}>Em Progresso</option>
+                            <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Concluída</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="start_date" class="form-label">Data de Início:</label>
+                        <input type="date" name="start_date" class="form-control" id="start_date" value="{{ request.GET.start_date }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="due_date" class="form-label">Data de Vencimento:</label>
+                        <input type="date" name="due_date" class="form-control" id="due_date" value="{{ request.GET.due_date }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                        <a href="{% url 'task_list' %}" class="btn btn-secondary">Limpar Filtros</a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Listagem de Tarefas Delegadas -->
+            <div class="row justify-content-center">
+                {% for task in assigned_tasks %}
+                    <div class="col-md-4 mb-4">
+                        {% if task.status == 'pending' %}
+                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #FFA500; border-radius: 15px; background-color: #FFF8E1;"> <!-- Laranja -->
+                        {% elif task.status == 'in_progress' %}
+                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #007BFF; border-radius: 15px; background-color: #D1ECF1;"> <!-- Azul -->
+                        {% elif task.status == 'completed' %}
+                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #28A745; border-radius: 15px; background-color: #D4EDDA;"> <!-- Verde -->
+                        {% endif %}
+                            <div class="card-header" style="background-color: #4B8C2A; color: white;">
+                                <h5 class="card-title mb-0" style="text-transform: uppercase;">{{ task.title }}</h5>
+                                <small>Status: {{ task.get_status_display }}</small>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Data de Início:</strong> {{ task.start_date|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Data de Vencimento:</strong> {{ task.due_date|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Responsável:</strong> {{ task.assignee.username }}</p>
+                                {% if task.file_attachment %}
+                                    <a href="{{ task.file_attachment.url }}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank">Ver Anexo</a>
+                                {% endif %}
+                                <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-primary mt-2">Ver</a> <!-- Botão Ver -->
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">Nenhuma tarefa encontrada com os filtros aplicados.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS customizado -->
+<style>
+    .transition-card {
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .transition-card:hover {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transform: scale(1.02);
+    }
+
+    .nav-link {
+        color: white; /* Cor do texto das abas */
+        background-color: #4B8C2A; /* Cor de fundo padrão */
+        border-color: #e0e0e0; /* Cor da borda */
+        transition: background-color 0.3s ease; /* Transição suave para a mudança de cor */
+    }
+    
+    .nav-link.active {
+        background-color: #2F6B1B; /* Cor de fundo quando a aba está ativa */
+        border-color: #4B8C2A; /* Cor da borda quando ativa */
+    }
+
+    .nav-link:hover {
+        background-color: #3C8A2A; /* Cor ao passar o mouse */
+    }
+</style>
+
+{% endblock %}

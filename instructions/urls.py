@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import update_item, update_order, create_item, delete_item, list_subcategories
 
+
 urlpatterns = [
     path('', views.list_instructions, name='list_instructions'),
     path('instruction/create/', views.create_instruction, name='create_instruction'),
@@ -22,10 +23,14 @@ urlpatterns = [
     path('sections/<int:pk>/delete/', views.delete_section, name='delete_section'),
     path('sections/<int:section_id>/categories/', views.list_categories, name='list_categories_for_section'),  # Nova URL
     path('categories/<int:category_id>/subcategories/', list_subcategories, name='list_subcategories_for_category'),
+     path('instructions/subcategory/<int:subcategory_id>/', views.list_instructions, name='list_instructions_for_subcategory'),
     path('categories/<int:pk>/update/', views.update_category, name='update_categories'),  # Adicione esta linha
-    path('categories/<int:pk>/delete/', views.delete_categories, name='delete_categories'),
+    path('categories/<int:pk>/delete/', views.delete_category, name='delete_categories'),
     path('update-order/', update_order, name='update_order'),
     path('update-item/', update_item, name='update_item'),
     path('create-item/', create_item, name='create_item'),
     path('delete-item/', delete_item, name='delete_item'),
-]
+    path('subcategories/update/<int:pk>/', views.update_subcategory, name='update_subcategory'),
+    path('subcategories/delete/<int:pk>/', views.delete_subcategory, name='delete_subcategory'),
+    
+] 
