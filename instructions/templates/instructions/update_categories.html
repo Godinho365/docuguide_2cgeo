@@ -9,11 +9,13 @@
                     <h5 class="card-title">Editar Categoria</h5>
                 </div>
                 <div class="card-body">
+                    
                     <form method="post" action="{% url 'update_categories' category.pk %}" enctype="multipart/form-data">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <div class="mt-3">
                             <button type="submit" class="btn btn-primary">Salvar</button>
+                            
                             <a href="{% url 'list_categories_for_section' category.section.id %}" class="btn btn-secondary">Cancelar</a>
                         </div>
                     </form>

@@ -233,45 +233,30 @@ def load_subcategories(request):
     return JsonResponse(list(subcategories.values('id', 'name')), safe=False)
 
 
+def list_categories_for_section(request, section_id):
+    section = get_object_or_404(Section, id=section_id)
+    categories = Category.objects.filter(section=section)
+    return render(request, 'instructions/list_categories.html', {'categories': categories, 'section': section})
 
-def create_category(request, section_id=None):
-    section = None
-    
-    # Tenta obter a seção se um ID for fornecido
-    if section_id:
-        section = get_object_or_404(Section, id=section_id)
-
+def create_category(request):
     if request.method == 'POST':
-        form = CategoryForm(request.POST, request.FILES)  # Adicione request.FILES
-
-        # Verifica se o formulário é válido
+        form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
-            # Obtém o nome da categoria
-            name = form.cleaned_data.get('name')
-            # Obtém o section_id do formulário
-            section_id = request.POST.get('section_id')
-
-            # Verifica se a seção foi passada e se já existe uma categoria com o mesmo nome
-            if section_id and Category.objects.filter(name=name, section_id=section_id).exists():
-                form.add_error('name', 'Uma categoria com este nome já existe nesta seção.')
-            else:
-                # Salva a nova categoria
-                category = form.save(commit=False)  # Não salva ainda
-                if section_id:  # Verifica se o section_id está presente
-                    category.section_id = section_id  # Define a seção usando o ID
-                category.save()  # Agora salva a categoria
-
-                return redirect('list_categories_for_section', section_id=category.section.id)  # Redireciona para a lista de categorias da seção
-
+            category = form.save()
+            print(f"Categoria criada: {category}")
+            return redirect('list_categories_for_section', section_id=category.section.id)
+        else:
+            print("Erros do formulário:", form.errors)
     else:
         form = CategoryForm()
 
-    return render(request, 'instructions/create_category.html', {'form': form, 'section': section})
-
+    print("Dados POST:", request.POST)
+    return render(request, 'instructions/create_category.html', {'form': form})
 
 
 def update_category(request, pk):
     # Obtém a categoria pelo ID
+    
     category = get_object_or_404(Category, pk=pk)
     section_id = category.section.id  # Obtém a seção automaticamente
 

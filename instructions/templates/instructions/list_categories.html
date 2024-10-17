@@ -72,7 +72,7 @@
                             </div>
 
                             <!-- Modal de Edição -->
-<div class="modal fade" id="editCategoryModal{{ category.id }}" tabindex="-1" aria-labelledby="editCategoryModalLabel{{ category.id }}" aria-hidden="true">
+<div class="modal fade" id="editCategoryModal{{ category.id }}" tabindex="-1" aria-labelledby="ditCategoryeModalLabel{{ category.id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -151,7 +151,7 @@
                 <div class="modal-body">
                     <form action="{% url 'create_category' %}" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input type="hidden" name="section_id" value="{{ section.id }}"> <!-- Campo oculto para associar à seção -->
+                        <input type="hidden" name="section" value="{{ section.id }}"> <!-- Campo oculto para associar à seção -->
                         <div class="mb-3">
                             <label for="newName" class="form-label">Nome da Nova Categoria</label>
                             <input type="text" class="form-control" id="newName" name="name" required>
