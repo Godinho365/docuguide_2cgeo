@@ -22,11 +22,17 @@ class SectionForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['name','section','imagem']  # Inclua apenas os campos que existem no modelo
+        fields = ['name', 'section', 'imagem']  # Inclua apenas os campos que existem no modelo
         widgets = {
             'section': forms.Select(attrs={'class': 'form-control'}),
             'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Caso a instância já esteja definida, isso garantirá que o campo section será preenchido
+        if 'instance' in kwargs:
+            self.fields['section'].initial = kwargs['instance'].section  # Preenche a seção atual
 
 class SubcategoryForm(forms.ModelForm):
     class Meta:

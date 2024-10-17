@@ -1,0 +1,101 @@
+<!-- templates/tasks/update_task.html -->
+{% extends "users/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Atualizar Tarefa</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Exibindo mensagens de erro do formulário -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <label for="id_title" class="form-label">Título</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="text-danger">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_description" class="form-label">Descrição</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div class="text-danger">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_assignee" class="form-label">Destinatário</label>
+            {{ form.assignee }}
+            {% if form.assignee.errors %}
+                <div class="text-danger">{{ form.assignee.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_start_date" class="form-label">Data de Início</label>
+            {{ form.start_date }}
+            {% if form.start_date.errors %}
+                <div class="text-danger">{{ form.start_date.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_due_date" class="form-label">Data de Vencimento</label>
+            {{ form.due_date }}
+            {% if form.due_date.errors %}
+                <div class="text-danger">{{ form.due_date.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_file_attachment" class="form-label">Anexo</label>
+            {{ form.file_attachment }}
+            {% if form.file_attachment.errors %}
+                <div class="text-danger">{{ form.file_attachment.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_status" class="form-label">Status</label>
+            {{ form.status }}
+            {% if form.status.errors %}
+                <div class="text-danger">{{ form.status.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Atualizar</button>
+        <!-- Botão de Voltar -->
+        <a href="{% url 'task_detail' task.pk %}" class="btn btn-secondary">Voltar</a>
+    </form>
+</div>
+
+<!-- Adicionando CSS e JS do Bootstrap Datepicker -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    // Inicializando o Bootstrap Datepicker para Data de Início
+    $('#id_start_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    // Inicializando o Bootstrap Datepicker para Data de Vencimento
+    $('#id_due_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    });
+});
+</script>
+{% endblock %}

@@ -2,28 +2,33 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-5">Painel de Tarefas</h2>
+    <h2 class="text-center mb-5"></h2>
 
     <!-- Nav tabs -->
-    <ul class="nav nav-tabs justify-content-center mb-4" id="myTab" role="tablist" style="border-radius: 5px;">
+    <ul class="nav nav-tabs justify-content-center mb-4" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="created-tasks-tab" data-bs-toggle="tab" href="#created-tasks" role="tab" aria-controls="created-tasks" aria-selected="true">
+            <a class="nav-link {% if request.GET.tab == 'created-tasks' or not request.GET.tab %}active{% endif %}" id="created-tasks-tab" data-bs-toggle="tab" href="#created-tasks" role="tab" aria-controls="created-tasks" aria-selected="true">
                 Tarefas Delegadas
             </a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="assigned-tasks-tab" data-bs-toggle="tab" href="#assigned-tasks" role="tab" aria-controls="assigned-tasks" aria-selected="false">
-                Minhas Tarefas
-            </a>
+            <div class="d-flex align-items-center">
+                <a class="nav-link {% if request.GET.tab == 'assigned-tasks' %}active{% endif %}" id="assigned-tasks-tab" data-bs-toggle="tab" href="#assigned-tasks" role="tab" aria-controls="assigned-tasks" aria-selected="false">
+                    Minhas Tarefas
+                </a>
+                <!-- Botão Criar Tarefa -->
+                <a href="{% url 'create_task' %}" class="btn btn-success ms-3">Criar Tarefa</a>
+            </div>
         </li>
     </ul>
 
     <!-- Tab content -->
     <div class="tab-content" id="myTabContent">
         <!-- Tarefas Criadas -->
-        <div class="tab-pane fade show active" id="created-tasks" role="tabpanel" aria-labelledby="created-tasks-tab">
+        <div class="tab-pane fade show {% if request.GET.tab == 'created-tasks' or not request.GET.tab %}active{% endif %}" id="created-tasks" role="tabpanel" aria-labelledby="created-tasks-tab">
             <!-- Formulário de filtro -->
             <form method="get" class="mb-4">
+                <input type="hidden" name="tab" value="created-tasks">
                 <div class="row align-items-end">
                     <div class="col-md-4 mb-3">
                         <select name="status" class="form-control">
@@ -45,7 +50,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
-                        <a href="{% url 'task_list' %}" class="btn btn-secondary">Limpar Filtros</a>
+                        <a href="{% url 'task_list' %}?tab=created-tasks" class="btn btn-secondary">Limpar Filtros</a>
                     </div>
                 </div>
             </form>
@@ -54,15 +59,9 @@
             <div class="row justify-content-center">
                 {% for task in created_tasks %}
                     <div class="col-md-4 mb-4">
-                        {% if task.status == 'pending' %}
-                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #FFA500; border-radius: 15px; background-color: #FFF8E1;"> <!-- Laranja -->
-                        {% elif task.status == 'in_progress' %}
-                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #007BFF; border-radius: 15px; background-color: #D1ECF1;"> <!-- Azul -->
-                        {% elif task.status == 'completed' %}
-                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #28A745; border-radius: 15px; background-color: #D4EDDA;"> <!-- Verde -->
-                        {% endif %}
+                        <div class="card h-100 shadow-sm transition-card" style="border: 2px solid {% if task.status == 'pending' %}#FFA500{% elif task.status == 'in_progress' %}#007BFF{% elif task.status == 'completed' %}#28A745{% endif %}; border-radius: 15px; background-color: {% if task.status == 'pending' %}#FFF8E1{% elif task.status == 'in_progress' %}#D1ECF1{% elif task.status == 'completed' %}#D4EDDA{% endif %};">
                             <div class="card-header" style="background-color: #4B8C2A; color: white;">
-                                <h5 class="card-title mb-0" style="text-transform: uppercase;">{{ task.title }}</h5>
+                                <h5 class="card-title mb-0 text-uppercase">{{ task.title }}</h5>
                                 <small>Status: {{ task.get_status_display }}</small>
                             </div>
                             <div class="card-body">
@@ -72,7 +71,10 @@
                                 {% if task.file_attachment %}
                                     <a href="{{ task.file_attachment.url }}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank">Ver Anexo</a>
                                 {% endif %}
-                                <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-primary mt-2">Ver</a> <!-- Botão Ver -->
+                                <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-primary mt-2">Ver</a>
+                                {% if user == task.creator %}
+                                    <a href="#" class="btn btn-sm btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="setDeleteUrl('{% url 'delete_task_created' task.id %}')">Excluir</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -85,9 +87,10 @@
         </div>
 
         <!-- Tarefas Delegadas -->
-        <div class="tab-pane fade" id="assigned-tasks" role="tabpanel" aria-labelledby="assigned-tasks-tab">
+        <div class="tab-pane fade {% if request.GET.tab == 'assigned-tasks' %}show active{% endif %}" id="assigned-tasks" role="tabpanel" aria-labelledby="assigned-tasks-tab">
             <!-- Formulário de filtro -->
             <form method="get" class="mb-4">
+                <input type="hidden" name="tab" value="assigned-tasks">
                 <div class="row align-items-end">
                     <div class="col-md-4 mb-3">
                         <select name="status" class="form-control">
@@ -109,7 +112,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
-                        <a href="{% url 'task_list' %}" class="btn btn-secondary">Limpar Filtros</a>
+                        <a href="{% url 'task_list' %}?tab=assigned-tasks" class="btn btn-secondary">Limpar Filtros</a>
                     </div>
                 </div>
             </form>
@@ -118,15 +121,9 @@
             <div class="row justify-content-center">
                 {% for task in assigned_tasks %}
                     <div class="col-md-4 mb-4">
-                        {% if task.status == 'pending' %}
-                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #FFA500; border-radius: 15px; background-color: #FFF8E1;"> <!-- Laranja -->
-                        {% elif task.status == 'in_progress' %}
-                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #007BFF; border-radius: 15px; background-color: #D1ECF1;"> <!-- Azul -->
-                        {% elif task.status == 'completed' %}
-                            <div class="card h-100 shadow-sm transition-card" style="border: 2px solid #28A745; border-radius: 15px; background-color: #D4EDDA;"> <!-- Verde -->
-                        {% endif %}
+                        <div class="card h-100 shadow-sm transition-card" style="border: 2px solid {% if task.status == 'pending' %}#FFA500{% elif task.status == 'in_progress' %}#007BFF{% elif task.status == 'completed' %}#28A745{% endif %}; border-radius: 15px; background-color: {% if task.status == 'pending' %}#FFF8E1{% elif task.status == 'in_progress' %}#D1ECF1{% elif task.status == 'completed' %}#D4EDDA{% endif %};">
                             <div class="card-header" style="background-color: #4B8C2A; color: white;">
-                                <h5 class="card-title mb-0" style="text-transform: uppercase;">{{ task.title }}</h5>
+                                <h5 class="card-title mb-0 text-uppercase">{{ task.title }}</h5>
                                 <small>Status: {{ task.get_status_display }}</small>
                             </div>
                             <div class="card-body">
@@ -136,7 +133,7 @@
                                 {% if task.file_attachment %}
                                     <a href="{{ task.file_attachment.url }}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank">Ver Anexo</a>
                                 {% endif %}
-                                <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-primary mt-2">Ver</a> <!-- Botão Ver -->
+                                <a href="{% url 'task_detail' task.id %}" class="btn btn-sm btn-primary mt-2">Ver</a>
                             </div>
                         </div>
                     </div>
@@ -150,31 +147,29 @@
     </div>
 </div>
 
-<!-- CSS customizado -->
-<style>
-    .transition-card {
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
-    }
-    .transition-card:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        transform: scale(1.02);
-    }
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Você tem certeza de que deseja excluir esta tarefa?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a id="confirmDelete" class="btn btn-danger">Excluir</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-    .nav-link {
-        color: white; /* Cor do texto das abas */
-        background-color: #4B8C2A; /* Cor de fundo padrão */
-        border-color: #e0e0e0; /* Cor da borda */
-        transition: background-color 0.3s ease; /* Transição suave para a mudança de cor */
+<script>
+    function setDeleteUrl(url) {
+        document.getElementById('confirmDelete').setAttribute('href', url);
     }
-    
-    .nav-link.active {
-        background-color: #2F6B1B; /* Cor de fundo quando a aba está ativa */
-        border-color: #4B8C2A; /* Cor da borda quando ativa */
-    }
-
-    .nav-link:hover {
-        background-color: #3C8A2A; /* Cor ao passar o mouse */
-    }
-</style>
+</script>
 
 {% endblock %}

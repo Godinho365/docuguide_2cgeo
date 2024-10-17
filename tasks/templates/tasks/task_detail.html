@@ -10,7 +10,7 @@
             <h5 class="card-title">Detalhes da Tarefa</h5>
             <p class="card-text"><strong>Delegante:</strong> {{ task.creator.username }}</p>
             <p class="card-text"><strong>Responsável:</strong> {{ task.assignee.username }}</p>
-            <p class="card-text"><strong>Atividade:</strong> {{ task.description }}</p> <!-- Adicionando a descrição -->
+            <p class="card-text"><strong>Atividade:</strong> {{ task.description }}</p>
             <p class="card-text"><strong>Data de Início:</strong> {{ task.start_date|date:"d/m/Y H:i" }}</p>
             <p class="card-text"><strong>Data de Vencimento:</strong> {{ task.due_date|date:"d/m/Y H:i" }}</p>
             <p class="card-text"><strong>Status:</strong> {{ task.get_status_display }}</p>
@@ -25,7 +25,36 @@
         <div class="card-footer">
             <a href="{% url 'task_list' %}" class="btn btn-secondary">Voltar</a>
             {% if request.user == task.assignee %}
-                <a href="{% url 'update_task_assigne' task.id %}" class="btn btn-primary">Atualizar</a>
+                <a href="{% url 'update_task_assigne' task.id %}" class="btn btn-primary">Atualizar Situação</a>
+            {% endif %}
+            {% if request.user == task.creator %}
+                <a href="{% url 'update_task_created' task.id %}" class="btn btn-primary">Editar Tarefa</a>
+                <!-- Botão para abrir o modal -->
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    Excluir Tarefa
+                </button>
+
+                <!-- Modal de confirmação -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Tem certeza de que deseja excluir esta tarefa? Esta ação não pode ser desfeita.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <form action="{% url 'delete_task_created' task.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

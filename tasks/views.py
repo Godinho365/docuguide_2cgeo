@@ -38,6 +38,7 @@ def task_list(request):
     status_filter = request.GET.get('status', '')
     start_date = request.GET.get('start_date', '')
     due_date = request.GET.get('due_date', '')
+    active_tab = request.GET.get('tab', 'created-tasks')  # Define a aba padrão como 'created-tasks'
 
     # Aplica o filtro de status às tarefas criadas e atribuídas ao usuário
     created_tasks = Task.objects.filter(creator=request.user)
@@ -55,7 +56,6 @@ def task_list(request):
 
     # Filtragem condicional para a data de vencimento
     if due_date:
-        # Usando due_date para filtrar tarefas com vencimento até a data selecionada
         created_tasks = created_tasks.filter(due_date__lte=due_date)
         assigned_tasks = assigned_tasks.filter(due_date__lte=due_date)
 
@@ -66,9 +66,11 @@ def task_list(request):
         'status_filter': status_filter,
         'start_date': start_date,
         'due_date': due_date,
+        'active_tab': active_tab,  # Passa a aba ativa no contexto
     }
 
     return render(request, 'tasks/task_list.html', context)
+
 
 
 def update_task_assigne(request, pk):
@@ -89,3 +91,37 @@ def update_task_assigne(request, pk):
 
     return render(request, 'tasks/update_task_assigne.html', {'form': form, 'task': task})
 
+def update_task_creator(request, task_id):
+    # Obtém a tarefa com base no ID
+    task = get_object_or_404(Task, id=task_id)
+    
+    # Verifica se o usuário é o criador da tarefa
+    if request.user != task.creator:
+        messages.error(request, "Você não tem permissão para editar esta tarefa.")
+        return redirect('task_detail', task_id=task.id)  # Redireciona para a página de detalhes da tarefa
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, request.FILES, instance=task)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tarefa atualizada com sucesso.")
+            return redirect('task_detail', task_id=task.id)  # Redireciona para a página de detalhes da tarefa
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'tasks/update_task_created.html', {'form': form, 'task': task})
+
+def delete_task_creator(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+
+    # Verifica se o usuário logado é o criador da tarefa
+    if request.user != task.creator:  # Supondo que 'creator' é o campo que representa o criador da tarefa
+        messages.error(request, 'Você não tem permissão para excluir esta tarefa.')
+        return redirect('task_detail', pk=task.pk)  # Redireciona para os detalhes da tarefa
+
+    if request.method == 'POST':
+        task.delete()  # Exclui a tarefa
+        messages.success(request, 'Tarefa excluída com sucesso!')
+        return redirect('task_list')  # Redireciona para a lista de tarefas ou outra página
+
+    return render(request, 'tasks/delete_task_created.html', {'task': task})

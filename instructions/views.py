@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import json
 from django.urls import reverse
+from django.http import JsonResponse
 
  #  INSTRUCTION
 @login_required
@@ -60,7 +61,7 @@ def update_instruction(request, pk):
     return render(request, 'instructions/update_instruction.html', {'form': form})
 
 @login_required
-def list_instructions(request, subcategory_id=None):  # Adiciona subcategory_id como argumento opcional
+def list_instructions(request):
     sections = Section.objects.all()
     categories = Category.objects.all()
     subcategories = Subcategory.objects.all()
@@ -68,15 +69,23 @@ def list_instructions(request, subcategory_id=None):  # Adiciona subcategory_id 
     # Obtenha os parâmetros GET
     section_id = request.GET.get('section')
     category_id = request.GET.get('category')
-
-    instructions = Instruction.objects.all()
+    subcategory_id = request.GET.get('subcategory')
 
     # Filtragem de instruções
+    instructions = Instruction.objects.all()
+
+    # Filtragem por seção
     if section_id:
         instructions = instructions.filter(section_id=section_id)
+        categories = categories.filter(section_id=section_id)  # Atualiza as categorias com base na seção
+
+    # Filtragem por categoria
     if category_id:
         instructions = instructions.filter(category_id=category_id)
-    if subcategory_id:  # Adiciona o filtro para subcategoria
+        subcategories = subcategories.filter(category_id=category_id)  # Atualiza as subcategorias com base na categoria
+
+    # Filtragem por subcategoria
+    if subcategory_id:
         instructions = instructions.filter(subcategory_id=subcategory_id)
 
     return render(request, 'instructions/list_instructions.html', {
@@ -85,10 +94,55 @@ def list_instructions(request, subcategory_id=None):  # Adiciona subcategory_id 
         'categories': categories,
         'subcategories': subcategories
     })
+
+
+
+
+
+
+from django.shortcuts import render
+from .models import Instruction, Section, Category, Subcategory
+
 def list_user_instructions(request):
-    # Filtra instruções pelo usuário autenticado
-    instructions = Instruction.objects.filter(author=request.user)
-    return render(request, 'instructions/list_user_instructions.html', {'instructions': instructions})
+    # Obtém o usuário autenticado
+    user = request.user
+
+    # Inicializa a queryset de instruções
+    instructions = Instruction.objects.filter(author=user)
+
+    sections = Section.objects.all()
+    categories = Category.objects.all()
+    subcategories = Subcategory.objects.all()
+
+    # Obtenha os parâmetros GET
+    section_id = request.GET.get('section')
+    category_id = request.GET.get('category')
+    subcategory_id = request.GET.get('subcategory')
+
+    # Filtragem de instruções
+    instructions = Instruction.objects.all()
+
+    # Filtragem por seção
+    if section_id:
+        instructions = instructions.filter(section_id=section_id)
+        categories = categories.filter(section_id=section_id)  # Atualiza as categorias com base na seção
+
+    # Filtragem por categoria
+    if category_id:
+        instructions = instructions.filter(category_id=category_id)
+        subcategories = subcategories.filter(category_id=category_id)  # Atualiza as subcategorias com base na categoria
+
+    # Filtragem por subcategoria
+    if subcategory_id:
+        instructions = instructions.filter(subcategory_id=subcategory_id)
+
+    return render(request, 'instructions/list_instructions.html', {
+        'instructions': instructions,
+        'sections': sections,
+        'categories': categories,
+        'subcategories': subcategories
+    })
+
 
 def detail_instruction(request, pk):
     instruction = get_object_or_404(Instruction, pk=pk)
@@ -219,6 +273,7 @@ def create_category(request, section_id=None):
 def update_category(request, pk):
     # Obtém a categoria pelo ID
     category = get_object_or_404(Category, pk=pk)
+    section_id = category.section.id  # Obtém a seção automaticamente
 
     if request.method == 'POST':
         # Inclui request.FILES para processar arquivos, como imagens
@@ -228,13 +283,13 @@ def update_category(request, pk):
             form.save()
             messages.success(request, 'Categoria atualizada com sucesso!')
             # Redireciona para a lista de categorias da seção
-            return redirect('list_categories_for_section', section_id=category.section.id)
+            return redirect('list_categories_for_section', section_id=section_id)
     else:
         # Preenche o formulário com os dados existentes da categoria
         form = CategoryForm(instance=category)
 
     # Renderiza o template com o formulário preenchido
-    return render(request, 'instructions/update_categories.html', {'form': form, 'category': category})
+    return render(request, 'instructions/update_categories.html', {'form': form, 'category': category, 'section_id': section_id})
 
 
 def delete_category(request, pk):
@@ -314,17 +369,14 @@ def delete_subcategory(request, pk):
 
 def ajax_load_categories(request):
     section_id = request.GET.get('section_id')
-    if section_id:
-        categories = Category.objects.filter(section_id=section_id).values('id', 'name')
-        return JsonResponse(list(categories), safe=False)
-    return JsonResponse([], safe=False)
+    categories = Category.objects.filter(section_id=section_id).values('id', 'name')
+    return JsonResponse(list(categories), safe=False)
 
 def ajax_load_subcategories(request):
     category_id = request.GET.get('category_id')
-    if category_id:
-        subcategories = Subcategory.objects.filter(category_id=category_id).values('id', 'name')
-        return JsonResponse(list(subcategories), safe=False)
-    return JsonResponse([], safe=False)
+    subcategories = Subcategory.objects.filter(category_id=category_id).values('id', 'name')
+    return JsonResponse(list(subcategories), safe=False)
+
 
 
 import logging

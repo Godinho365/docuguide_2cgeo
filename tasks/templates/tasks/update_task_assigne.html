@@ -12,7 +12,7 @@
                 {{ form.status.label_tag }} {{ form.status }}  <!-- Campo de status -->
                 {{ form.observation.label_tag }} {{ form.observation }}  <!-- Campo de observação -->
                 <button type="submit" class="btn btn-primary">Salvar</button>
-                <a href="{% url 'task_list' %}" class="btn btn-secondary">Voltar</a>
+                <a href="{% url 'task_detail' task.pk %}" class="btn btn-secondary">Voltar</a>
             </form>
         </div>
     </div>

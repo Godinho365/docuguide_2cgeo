@@ -5,9 +5,6 @@
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row justify-content-center">
-        <!-- Incluir a sidebar a partir do template 'estrutura_base_doc.html' -->
-
-        <!-- Conteúdo principal ajustado para o layout com a sidebar -->
         <main class="col-lg-9 col-md-10 main-content">
             <h1 class="text-center mb-4 text-uppercase" style="color: #2E8B57;">Instruções</h1>
 
@@ -29,9 +26,13 @@
                         <label for="category-filter" class="font-weight-bold" style="color: #4B5320;">Filtrar por Categoria</label>
                         <select id="category-filter" class="form-control">
                             <option value="">Todas as Categorias</option>
-                            {% for category in categories %}
-                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
-                            {% endfor %}
+                            {% if request.GET.section %}
+                                {% for category in categories %}
+                                    {% if category.section.id|stringformat:"s" == request.GET.section %} 
+                                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                         </select>
                     </div>
                 </div>
@@ -40,9 +41,13 @@
                         <label for="subcategory-filter" class="font-weight-bold" style="color: #4B5320;">Filtrar por Subcategoria</label>
                         <select id="subcategory-filter" class="form-control">
                             <option value="">Todas as Subcategorias</option>
-                            {% for subcategory in subcategories %}
-                                <option value="{{ subcategory.id }}" {% if request.GET.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
-                            {% endfor %}
+                            {% if request.GET.category %}
+                                {% for subcategory in subcategories %}
+                                    {% if subcategory.category.id|stringformat:"s" == request.GET.category %}
+                                        <option value="{{ subcategory.id }}" {% if request.GET.subcategory == subcategory.id|stringformat:"s" %}selected{% endif %}>{{ subcategory.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                         </select>
                     </div>
                 </div>
@@ -50,9 +55,7 @@
 
             <!-- Botão para criar uma nova instrução -->
             <div class="text-center mb-4">
-                <a href="{% url 'create_instruction' %}" class="btn btn-outline-success btn-lg">
-                    Nova Instrução
-                </a>
+                <a href="{% url 'create_instruction' %}" class="btn btn-outline-success btn-lg">Nova Instrução</a>
             </div>
 
             <!-- Lista de Instruções -->
@@ -107,7 +110,7 @@
                             text: category.name
                         }));
                     });
-                    $('#subcategory-filter').empty().append('<option value="">Todas as Subcategorias</option>');
+                    $('#subcategory-filter').empty().append('<option value="">Todas as Subcategorias</option>'); // Limpa subcategorias
                 }
             });
         });
