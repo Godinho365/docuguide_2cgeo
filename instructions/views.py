@@ -256,25 +256,34 @@ def create_category(request):
 
 def update_category(request, pk):
     # Obtém a categoria pelo ID
-    
     category = get_object_or_404(Category, pk=pk)
     section_id = category.section.id  # Obtém a seção automaticamente
 
     if request.method == 'POST':
         # Inclui request.FILES para processar arquivos, como imagens
         form = CategoryForm(request.POST, request.FILES, instance=category)
-        
+
         if form.is_valid():
-            form.save()
+            # Define a seção manualmente antes de salvar
+            category = form.save(commit=False)
+            category.section_id = section_id
+            category.save()
+
             messages.success(request, 'Categoria atualizada com sucesso!')
             # Redireciona para a lista de categorias da seção
             return redirect('list_categories_for_section', section_id=section_id)
-    else:
-        # Preenche o formulário com os dados existentes da categoria
-        form = CategoryForm(instance=category)
+        else:
+            # Adiciona mensagens de erro ao contexto, se necessário
+            messages.error(request, 'Erro ao atualizar a categoria. Verifique os campos.')
+
+    # Preenche o formulário com os dados existentes da categoria
+    form = CategoryForm(instance=category)
 
     # Renderiza o template com o formulário preenchido
     return render(request, 'instructions/update_categories.html', {'form': form, 'category': category, 'section_id': section_id})
+
+
+
 
 
 def delete_category(request, pk):
@@ -295,7 +304,8 @@ def create_subcategory(request, category_id=None):
         category = get_object_or_404(Category, id=category_id)
 
     if request.method == 'POST':
-        form = SubcategoryForm(request.POST)
+        # Adiciona request.FILES para capturar a imagem enviada
+        form = SubcategoryForm(request.POST, request.FILES)
 
         # Verifica se o formulário é válido
         if form.is_valid():
@@ -313,12 +323,13 @@ def create_subcategory(request, category_id=None):
                     subcategory.category_id = category_id  # Define a categoria usando o ID
                 subcategory.save()  # Agora salva a subcategoria
 
-                return redirect('list_subcategories_for_category', category_id=subcategory.category.id)  # Redireciona para a lista de subcategorias da categoria
+                return redirect('list_subcategories_for_category', category_id=subcategory.category.id)
 
     else:
         form = SubcategoryForm()
 
     return render(request, 'instructions/create_subcategory.html', {'form': form, 'category': category})
+
 
 def update_subcategory(request, pk):
     subcategory = get_object_or_404(Subcategory, pk=pk)
@@ -362,6 +373,18 @@ def ajax_load_subcategories(request):
     subcategories = Subcategory.objects.filter(category_id=category_id).values('id', 'name')
     return JsonResponse(list(subcategories), safe=False)
 
+def list_instructions_for_subcategory(request, subcategory_id):
+    # Obtém a subcategoria correspondente ou retorna um erro 404 se não for encontrada
+    subcategory = get_object_or_404(Subcategory, id=subcategory_id)
+    
+    # Filtra as instruções que estão associadas à subcategoria
+    instructions = Instruction.objects.filter(subcategory=subcategory)
+    
+    # Renderiza o template com as instruções filtradas
+    return render(request, 'instructions/list_instructions_for_subcategory.html', {
+        'subcategory': subcategory,
+        'instructions': instructions,
+    })
 
 
 import logging
@@ -448,6 +471,8 @@ def update_item(request):
         return JsonResponse({'status': 'error', 'message': 'Item not found'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+
 
 @csrf_exempt
 @require_POST

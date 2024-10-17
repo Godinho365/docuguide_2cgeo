@@ -16,7 +16,7 @@
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100 shadow-sm border-light" style="border: 1px solid #4B8C2A;">
                                     <div class="card-img-container" style="height: 200px; display: flex; justify-content: center; align-items: center;">
-                                        <a href="{% url 'list_instructions_for_subcategory' subcategory.id %}" style="display: block; width: 100%; height: 100%; text-align: center;">
+                                        <a href="{% url 'list_instructions_for_subcategories' subcategory.id %}" style="display: block; width: 100%; height: 100%; text-align: center;">
                                             {% if subcategory.imagem %}
                                                 <img src="{{ subcategory.imagem.url }}" class="card-img-top" alt="{{ subcategory.name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                             {% else %}
@@ -41,23 +41,26 @@
                             </div>
 
                             <!-- Modal de Confirmação de Exclusão -->
-                            <div class="modal fade" id="deleteSubcategoryModal{{ subcategory.id }}" tabindex="-1" aria-labelledby="deleteSubcategoryModalLabel{{ subcategory.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteSubcategoryModalLabel{{ subcategory.id }}">Confirmar Exclusão</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Tem certeza de que deseja excluir a subcategoria <strong>{{ subcategory.name }}</strong>?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{% url 'delete_subcategory' subcategory.id %}" class="btn btn-danger">Excluir</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<div class="modal fade" id="deleteSubcategoryModal{{ subcategory.id }}" tabindex="-1" aria-labelledby="deleteSubcategoryModalLabel{{ subcategory.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteSubcategoryModalLabel{{ subcategory.id }}">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza de que deseja excluir a subcategoria <strong>{{ subcategory.name }}</strong>?</p>
+                <!-- Formulário de Exclusão -->
+                <form action="{% url 'delete_subcategory' subcategory.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
                         {% empty %}
                             <div class="col-md-12 text-center">
                                 <p>Nenhuma subcategoria encontrada.</p>
@@ -88,7 +91,9 @@
                             <label for="imagem" class="form-label">Imagem</label>
                             <input type="file" class="form-control" id="imagem" name="imagem">
                         </div>
+                        <input type="hidden" name="category" value="{{ category.id }}">
                         <input type="hidden" name="category_id" value="{{ category.id }}">
+                        <input type="hidden" name="section" value="{{ category.section.id }}">
                         <button type="submit" class="btn btn-primary">Criar Subcategoria</button>
                     </form>
                 </div>
