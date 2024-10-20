@@ -15,7 +15,16 @@
     .card {
         border-radius: 0.5rem; /* Bordas arredondadas */
         background-color: #ffffff; /* Fundo branco para o card */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Sombra leve */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+        max-width: 900px; /* Largura máxima do card aumentada */
+        margin: 20px auto; /* Centraliza o card com margem */
+        transition: transform 0.3s, box-shadow 0.3s; /* Transições suaves */
+    }
+
+    /* Efeito de hover no card */
+    .card:hover {
+        transform: translateY(-5px); /* Levanta o card no hover */
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2); /* Sombra mais intensa no hover */
     }
 
     /* Estilos do cabeçalho do card */
@@ -30,6 +39,7 @@
     .btn-primary {
         background-color: #28a745; /* Verde claro */
         border-color: #28a745; /* Cor da borda */
+        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
     }
 
     /* Estilos de hover do botão */
@@ -41,6 +51,7 @@
     .btn-secondary {
         background-color: #6c757d; /* Cinza para botões secundários */
         border-color: #6c757d; /* Cor da borda */
+        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
     }
 
     /* Estilos de hover do botão secundário */

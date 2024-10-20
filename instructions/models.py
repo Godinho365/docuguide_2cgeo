@@ -9,8 +9,9 @@ class Instruction(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='instructions')
     subcategory = models.ForeignKey('Subcategory', on_delete=models.CASCADE, related_name='instructions')
     tags = models.ManyToManyField('Tag', blank=True, related_name='instructions')
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    view_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title

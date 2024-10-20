@@ -1,0 +1,65 @@
+{% extends 'users/base.html' %}
+
+{% block title %}
+    Resultados da Busca - {{ query }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center text-success">Resultados da Busca para: "{{ query }}"</h2>
+
+    {% if results %}
+        <table class="table table-bordered table-hover">
+            <thead class="table-success">
+                <tr>
+                    <th>Título</th>
+                    <th>Seção</th>
+                    <th>Categoria</th>
+                    <th>Subcategoria</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for instruction in results %}
+                <tr>
+                    <td>
+                        <a href="{% url 'detail_instruction' instruction.id %}" class="text-success">{{ instruction.title }}</a>
+                    </td>
+                    <td>{{ instruction.section.title }}</td>
+                    <td>{{ instruction.category.name }}</td>
+                    <td>{{ instruction.subcategory.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Nenhum resultado encontrado para sua busca.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Adicionando um estilo personalizado -->
+<style>
+    body {
+        background-color: #f8f9fa; /* Um fundo claro para contrastar com o verde */
+    }
+
+    .table-success {
+        background-color: #d4edda; /* Cor de fundo verde claro para cabeçalho da tabela */
+    }
+
+    .text-success {
+        color: #28a745 !important; /* Verde padrão do Bootstrap */
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #c3e6cb; /* Cor verde clara ao passar o mouse sobre a linha */
+    }
+
+    .alert-warning {
+        background-color: #fff3cd; /* Fundo para alertas */
+        color: #856404; /* Cor do texto do alerta */
+    }
+</style>
+
+{% endblock %}

@@ -1,14 +1,160 @@
-{% extends "users/base.html" %}
-
-{% block title %}Editar Grupo{% endblock %}
+{% extends 'estrutura_base_doc.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Editar Grupo</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-    </form>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Gerenciar Grupos</h3>
+        </div>
+        <div class="card-body">
+            <div class="button-group">
+                <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+                    Criar Grupo
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteGroupModal">
+                    Excluir Grupo
+                </button>
+            </div>
+            <table class="table mt-3">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in groups %}
+                    <tr>
+                        <td>{{ group.id }}</td>
+                        <td>{{ group.name }}</td>
+                        <td>
+                            <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#editGroupModal" data-group-id="{{ group.id }}" data-group-name="{{ group.name }}">
+                                Editar
+                            </button>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteGroupModal" data-group-id="{{ group.id }}" data-group-name="{{ group.name }}">
+                                Excluir
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+<!-- Modal Criar Grupo -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGroupModalLabel">Criar Novo Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'create_group' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="groupName" class="form-label">Nome do Grupo</label>
+                        <input type="text" class="form-control" id="groupName" name="groupName" required>
+                        <div class="error">
+                            {% if form.groupName.errors %}
+                                {{ form.groupName.errors }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-custom">Salvar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Grupo -->
+<div class="modal fade" id="editGroupModal" tabindex="-1" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGroupModalLabel">Editar Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'edit_group' 0 %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="editGroupName" class="form-label">Nome do Grupo</label>
+                        <input type="text" class="form-control" id="editGroupName" name="groupName" required>
+                        <div class="error">
+                            {% if form.groupName.errors %}
+                                {{ form.groupName.errors }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-custom">Salvar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Grupo -->
+<div class="modal fade" id="deleteGroupModal" tabindex="-1" aria-labelledby="deleteGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGroupModalLabel">Excluir Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você tem certeza que deseja excluir o grupo <strong id="deleteGroupName"></strong>?</p>
+                <form method="post" action="{% url 'delete_group' 0 %}">
+                    {% csrf_token %}
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-custom">Excluir</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Preencher os campos do modal de edição
+    var editGroupModal = document.getElementById('editGroupModal');
+    editGroupModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Botão que acionou o modal
+        var groupId = button.getAttribute('data-group-id');
+        var groupName = button.getAttribute('data-group-name');
+
+        // Atualizar os campos do modal
+        var editGroupName = editGroupModal.querySelector('#editGroupName');
+        editGroupName.value = groupName;
+
+        // Atualiza a ação do formulário
+        editGroupModal.querySelector('form').action = "{% url 'edit_group' 0 %}".replace('0', groupId);
+    });
+
+    // Preencher os campos do modal de exclusão
+    var deleteGroupModal = document.getElementById('deleteGroupModal');
+    deleteGroupModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Botão que acionou o modal
+        var groupId = button.getAttribute('data-group-id');
+        var groupName = button.getAttribute('data-group-name');
+
+        // Atualizar o nome do grupo que será excluído
+        var deleteGroupName = deleteGroupModal.querySelector('#deleteGroupName');
+        deleteGroupName.textContent = groupName;
+
+        // Atualiza a ação do formulário
+        deleteGroupModal.querySelector('form').action = "{% url 'delete_group' 0 %}".replace('0', groupId);
+    });
+</script>
 {% endblock %}

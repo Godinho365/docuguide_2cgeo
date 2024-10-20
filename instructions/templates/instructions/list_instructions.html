@@ -61,13 +61,17 @@
             <!-- Lista de Instruções -->
             <div class="row justify-content-center">
                 {% for instruction in instructions %}
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-4 d-flex align-items-stretch">
-                    <div class="card border-dark w-100" style="background-color: #F5F5F5;">
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex align-items-stretch">
+                    <div class="card border-dark" style="background-color: #F5F5F5; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-center">
-                                <a href="{% url 'detail_instruction' instruction.pk %}" style="color: #2E8B57;">{{ instruction.title }}</a>
+                                <a href="{% url 'detail_instruction' instruction.pk %}" style="color: #2E8B57; text-decoration: none;">{{ instruction.title }}</a>
                             </h5>
-                            <p class="card-text text-center"><strong>Autor:</strong> {{ instruction.author }}</p>
+                            <div class="text-center mb-2">
+                                <span class="badge" style="background-color: #DAF7A6; color: black; margin-bottom: 5px;">{{ instruction.section.title }}</span>
+                                <span class="badge" style="background-color: #33B5FF; color: white; margin-bottom: 5px;">{{ instruction.category.name }}</span>
+                                <span class="badge" style="background-color: #FFC300; color: white;">{{ instruction.subcategory.name }}</span>
+                            </div>
                         </div>
                         <div class="card-footer mt-auto text-center">
                             <a href="{% url 'detail_instruction' instruction.pk %}" class="btn btn-success" style="background-color: #4B5320; color: white;">
@@ -84,6 +88,57 @@
                 </div>
                 {% endfor %}
             </div>
+
+           <!-- Paginação -->
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <!-- Primeira Página e Página Anterior -->
+                {% if instructions.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1&section={{ request.GET.section }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}" aria-label="Primeira">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ instructions.previous_page_number }}&section={{ request.GET.section }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                <!-- Páginas -->
+                {% for i in instructions.paginator.page_range %}
+                    {% if instructions.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link" style="background-color: #4B5320; border-color: #4B5320;">{{ i }}</span>
+                        </li>
+                    {% elif i >= instructions.number|add:'-2' and i <= instructions.number|add:'2' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}&section={{ request.GET.section }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Próxima Página e Última Página -->
+                {% if instructions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ instructions.next_page_number }}&section={{ request.GET.section }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}" aria-label="Próxima">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ instructions.paginator.num_pages }}&section={{ request.GET.section }}&category={{ request.GET.category }}&subcategory={{ request.GET.subcategory }}" aria-label="Última">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
         </main>
     </div>
 </div>
@@ -135,16 +190,14 @@
             });
         });
 
-        // Atualiza os filtros via URL
-        function updateFilters() {
-            var sectionId = $('#section-filter').val();
-            var categoryId = $('#category-filter').val();
-            var subcategoryId = $('#subcategory-filter').val();
-            var queryString = `?section=${sectionId}&category=${categoryId}&subcategory=${subcategoryId}`;
-            window.location.href = queryString;
-        }
-
-        $('#section-filter, #category-filter, #subcategory-filter').on('change', updateFilters);
+        // Atualiza os filtros via GET quando uma seleção for feita
+        $('#section-filter, #category-filter, #subcategory-filter').on('change', function() {
+            var section = $('#section-filter').val();
+            var category = $('#category-filter').val();
+            var subcategory = $('#subcategory-filter').val();
+            var url = '?section=' + section + '&category=' + category + '&subcategory=' + subcategory;
+            window.location.href = url; // Redireciona com os parâmetros de filtro
+        });
     });
 </script>
 {% endblock %}

@@ -63,7 +63,7 @@ def create_group(request):
         form = GroupForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('profile')
+            return redirect('list_groups')
     else:
         form = GroupForm()
     return render(request, 'users/create_group.html', {'form': form})
@@ -97,13 +97,20 @@ def delete_group(request, pk):
 
 @user_passes_test(lambda u: u.is_superuser)
 def list_users_and_groups(request):
-    users = User.objects.all().order_by('date_joined')  # Ordena por data de criação
+    query = request.GET.get('search', '')  # Obtém a busca do GET
+    if query:
+        users = User.objects.filter(username__icontains=query).order_by('date_joined')  # Filtra os usuários
+    else:
+        users = User.objects.all().order_by('date_joined')  # Obtém todos os usuários se não houver busca
+
     groups = Group.objects.all()  # Obtém todos os grupos
     context = {
         'users': users,
-        'groups': groups
+        'groups': groups,
+        'search_query': query  # Passa a consulta de busca para o template
     }
     return render(request, 'users/list_users_and_groups.html', context)
+
 
 
 

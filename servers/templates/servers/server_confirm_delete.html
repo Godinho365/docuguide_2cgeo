@@ -1,0 +1,12 @@
+<!-- servers/templates/servers/server_confirm_delete.html -->
+{% extends 'users/base.html' %}
+
+{% block content %}
+<h2>Confirmar Deleção</h2>
+<p>Você tem certeza que deseja deletar o servidor "{{ server.name }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Deletar</button>
+    <a href="{% url 'list_servers' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

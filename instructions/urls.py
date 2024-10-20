@@ -33,5 +33,8 @@ urlpatterns = [
     path('delete-item/', delete_item, name='delete_item'),
     path('subcategories/update/<int:pk>/', views.update_subcategory, name='update_subcategory'),
     path('subcategories/delete/<int:pk>/', views.delete_subcategory, name='delete_subcategory'),
+    path('instruction/<int:pk>/pdf/', views.generate_pdf, name='generate_pdf'),
+    path('search/', views.search_instructions, name='search_instructions'),
+    
     
 ] 

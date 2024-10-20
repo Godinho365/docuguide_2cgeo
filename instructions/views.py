@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Instruction, Section, Category, Subcategory
 from .forms import InstructionForm, SectionForm, CategoryForm, SubcategoryForm
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import user_passes_test
@@ -12,6 +12,9 @@ from django.views.decorators.http import require_POST
 import json
 from django.urls import reverse
 from django.http import JsonResponse
+from django.core.paginator import Paginator
+from io import BytesIO
+from xhtml2pdf import pisa 
 
  #  INSTRUCTION
 @login_required
@@ -88,8 +91,13 @@ def list_instructions(request):
     if subcategory_id:
         instructions = instructions.filter(subcategory_id=subcategory_id)
 
+    # Paginação
+    paginator = Paginator(instructions, 12)  # Mostra 12 instruções por página
+    page_number = request.GET.get('page')
+    instructions_page = paginator.get_page(page_number)
+
     return render(request, 'instructions/list_instructions.html', {
-        'instructions': instructions,
+        'instructions': instructions_page,  # Use a página paginada
         'sections': sections,
         'categories': categories,
         'subcategories': subcategories
@@ -107,7 +115,7 @@ def list_user_instructions(request):
     # Obtém o usuário autenticado
     user = request.user
 
-    # Inicializa a queryset de instruções
+    # Inicializa a queryset de instruções filtrando pelo autor
     instructions = Instruction.objects.filter(author=user)
 
     sections = Section.objects.all()
@@ -120,7 +128,8 @@ def list_user_instructions(request):
     subcategory_id = request.GET.get('subcategory')
 
     # Filtragem de instruções
-    instructions = Instruction.objects.all()
+    # A filtragem já está feita anteriormente, então não redefinimos
+    # instructions = Instruction.objects.filter(author=user)  # Remover esta linha
 
     # Filtragem por seção
     if section_id:
@@ -136,7 +145,7 @@ def list_user_instructions(request):
     if subcategory_id:
         instructions = instructions.filter(subcategory_id=subcategory_id)
 
-    return render(request, 'instructions/list_instructions.html', {
+    return render(request, 'instructions/list_user_instructions.html', {
         'instructions': instructions,
         'sections': sections,
         'categories': categories,
@@ -144,8 +153,14 @@ def list_user_instructions(request):
     })
 
 
+
 def detail_instruction(request, pk):
     instruction = get_object_or_404(Instruction, pk=pk)
+    
+    # Incrementar o campo de visualizações
+    instruction.view_count += 1
+    instruction.save()
+    
     return render(request, 'instructions/detail_instruction.html', {'instruction': instruction})
 
 #SEÇÕES
@@ -154,9 +169,10 @@ def create_section(request):
     if request.method == 'POST':
         form = SectionForm(request.POST, request.FILES)  # Inclua request.FILES para o upload de imagem
         if form.is_valid():
-            # Verifica se já existe uma seção com o mesmo título
-            title = form.cleaned_data.get('title')
-            if Section.objects.filter(title=title).exists():
+            title = form.cleaned_data['title'].lower()  # Obtém o título em minúsculas
+            
+            # Verifica se uma seção com este título já existe
+            if Section.objects.filter(title__iexact=title).exists():  # Usando 'iexact' para ignorar maiúsculas/minúsculas
                 form.add_error('title', 'Uma seção com este título já existe.')
             else:
                 form.save()
@@ -164,7 +180,10 @@ def create_section(request):
     else:
         form = SectionForm()
     
-    return render(request, 'instructions/create_section.html', {'form': form})
+    # Definir show_modal como True se houver erros de validação
+    show_modal = not form.is_valid() or bool(form.errors)
+    
+    return render(request, 'instructions/create_section.html', {'form': form, 'show_modal': show_modal})
 
 
 def is_superuser(user):
@@ -238,13 +257,22 @@ def list_categories_for_section(request, section_id):
     categories = Category.objects.filter(section=section)
     return render(request, 'instructions/list_categories.html', {'categories': categories, 'section': section})
 
+from django.contrib import messages  # Importando para mensagens
+
 def create_category(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
-            category = form.save()
-            print(f"Categoria criada: {category}")
-            return redirect('list_categories_for_section', section_id=category.section.id)
+            category_name = form.cleaned_data['name'].lower()  # Obtém o nome da categoria em minúsculas
+            
+            # Verifica se uma categoria com este nome já existe na mesma seção
+            section_id = form.cleaned_data['section'].id  # Obtém o ID da seção
+            if Category.objects.filter(name__iexact=category_name, section_id=section_id).exists():  # Usando 'iexact' para ignorar maiúsculas/minúsculas
+                form.add_error('name', 'Uma categoria com este nome já existe nesta seção.')
+            else:
+                category = form.save()
+                messages.success(request, 'Categoria criada com sucesso!')  # Mensagem de sucesso
+                return redirect('list_categories_for_section', section_id=category.section.id)
         else:
             print("Erros do formulário:", form.errors)
     else:
@@ -252,6 +280,7 @@ def create_category(request):
 
     print("Dados POST:", request.POST)
     return render(request, 'instructions/create_category.html', {'form': form})
+
 
 
 def update_category(request, pk):
@@ -274,7 +303,7 @@ def update_category(request, pk):
             return redirect('list_categories_for_section', section_id=section_id)
         else:
             # Adiciona mensagens de erro ao contexto, se necessário
-            messages.error(request, 'Erro ao atualizar a categoria. Verifique os campos.')
+            messages.error(request, '')
 
     # Preenche o formulário com os dados existentes da categoria
     form = CategoryForm(instance=category)
@@ -309,20 +338,22 @@ def create_subcategory(request, category_id=None):
 
         # Verifica se o formulário é válido
         if form.is_valid():
-            name = form.cleaned_data.get('name')
+            name = form.cleaned_data.get('name')  # Nome da subcategoria
             # Obtém o category_id do formulário
             category_id = request.POST.get('category_id')
 
             # Verifica se a categoria foi passada e se já existe uma subcategoria com o mesmo nome
-            if category_id and Subcategory.objects.filter(name=name, category_id=category_id).exists():
+            if category_id and Subcategory.objects.filter(name__iexact=name, category_id=category_id).exists():  # Usando 'iexact' para ignorar maiúsculas/minúsculas
                 form.add_error('name', 'Uma subcategoria com este nome já existe nesta categoria.')
             else:
                 # Salva a nova subcategoria
                 subcategory = form.save(commit=False)  # Não salva ainda
                 if category_id:  # Verifica se o category_id está presente
                     subcategory.category_id = category_id  # Define a categoria usando o ID
+                subcategory.name = name.lower()  # Salva o nome da subcategoria em minúsculas
                 subcategory.save()  # Agora salva a subcategoria
 
+                messages.success(request, 'Subcategoria criada com sucesso!')  # Mensagem de sucesso
                 return redirect('list_subcategories_for_category', category_id=subcategory.category.id)
 
     else:
@@ -499,3 +530,47 @@ def delete_item(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
   
+def generate_pdf(request, pk):
+    instruction = get_object_or_404(Instruction, pk=pk)
+    # Renderizar o template como HTML
+    template_path = 'instructions/instruction_pdf.html'
+    context = {'instruction': instruction}
+    html = render(request, template_path, context).content.decode('utf-8')
+
+    # Criar uma resposta HTTP para o PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="instruction_{pk}.pdf"'
+
+    # Converter o HTML para PDF
+    pisa_status = pisa.CreatePDF(
+        BytesIO(html.encode('utf-8')), dest=response
+    )
+
+    # Verificar se houve algum erro na conversão
+    if pisa_status.err:
+        return HttpResponse('Erro ao gerar o PDF', status=500)
+    return response
+
+
+from django.shortcuts import render
+from django.db.models import Q  # Importando Q para consultas complexas
+from .models import Instruction
+
+def search_instructions(request):
+    query = request.GET.get('q')
+    results = []
+
+    if query:
+        print(f"Buscando por: {query}")  # Verifique se a consulta está correta
+
+        # Filtrando as instruções pelo título, seção, categoria e subcategoria
+        results = Instruction.objects.filter(
+            Q(title__icontains=query) |
+            Q(section__title__icontains=query) |  # Assumindo que você tem um campo 'title' na seção
+            Q(category__name__icontains=query) |  # Assumindo que você tem um campo 'name' na categoria
+            Q(subcategory__name__icontains=query)  # Assumindo que você tem um campo 'name' na subcategoria
+        )
+
+        print(f"Resultados encontrados: {results.count()}")  # Verificando quantos resultados foram encontrados
+
+    return render(request, 'instructions/search_results.html', {'results': results, 'query': query})

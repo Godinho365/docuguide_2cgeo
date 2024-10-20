@@ -24,6 +24,9 @@ INSTALLED_APPS = [
     'ckeditor',
     'instructions',
     'tasks',
+    'servers'
+    
+
 ]
 
 MIDDLEWARE = [

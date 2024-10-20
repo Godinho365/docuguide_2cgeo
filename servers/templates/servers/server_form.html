@@ -1,0 +1,12 @@
+<!-- servers/templates/servers/server_form.html -->
+{% extends 'users/base.html' %}
+
+{% block content %}
+<h2>{% if form.instance.pk %}Editar{% else %}Adicionar{% endif %} Servidor</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Salvar</button>
+</form>
+<a href="{% url 'list_servers' %}" class="btn btn-secondary">Voltar</a>
+{% endblock %}

@@ -1,22 +1,22 @@
 {% extends "users/base.html" %}
 
+{% block title %}Editar Categoria{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Editar Categoria</h5>
+        <div class="col-md-8 mx-auto">
+            <div class="card mb-4" style="border: 2px solid #4B8C2A; border-radius: 15px; background-color: #F8F9FA; transition: transform 0.2s;">
+                <div class="card-header text-center" style="background-color: #4B8C2A; color: white;">
+                    <h5 class="card-title" style="text-transform: uppercase;">Editar Categoria: {{ category.name }}</h5>
                 </div>
                 <div class="card-body">
-                    
-                    <form method="post" action="{% url 'update_categories' category.pk %}" enctype="multipart/form-data">
+                    <form method="post" action="{% url 'update_categories' category.pk %}" enctype="multipart/form-data" id="edit-category-form">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <div class="mt-3">
-                            <button type="submit" class="btn btn-primary">Salvar</button>
-                            
-                            <a href="{% url 'list_categories_for_section' category.section.id %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success" id="save-button">Salvar</button>
+                            <a href="{% url 'list_categories_for_section' category.section.id %}" class="btn btn-danger" id="cancel-button">Cancelar</a>
                         </div>
                     </form>
                 </div>
@@ -24,4 +24,40 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Adicionando um efeito de hover ao card
+    const card = document.querySelector('.card');
+    card.addEventListener('mouseover', () => {
+        card.style.transform = 'scale(1.00)';
+    });
+    card.addEventListener('mouseout', () => {
+        card.style.transform = 'scale(1)';
+    });
+
+    // Feedback ao salvar
+    document.getElementById('edit-category-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Previne o envio padrão do formulário
+
+        const saveButton = document.getElementById('save-button');
+        saveButton.innerHTML = 'Salvando...'; // Atualiza o texto do botão
+        saveButton.disabled = true; // Desabilita o botão para prevenir múltiplos cliques
+
+        // Simulação de uma requisição para enviar o formulário
+        setTimeout(() => {
+            this.submit(); // Envia o formulário após 1 segundo (simulação de requisição)
+        }, 1000);
+    });
+    
+    // Efeito ao passar o mouse sobre o botão de cancelar
+    const cancelButton = document.getElementById('cancel-button');
+    cancelButton.addEventListener('mouseover', () => {
+        cancelButton.style.backgroundColor = '#FF6F61'; // Muda a cor ao passar o mouse
+        cancelButton.style.color = 'white'; // Altera a cor do texto
+    });
+    cancelButton.addEventListener('mouseout', () => {
+        cancelButton.style.backgroundColor = ''; // Restaura a cor original
+        cancelButton.style.color = ''; // Restaura a cor original do texto
+    });
+</script>
 {% endblock %}

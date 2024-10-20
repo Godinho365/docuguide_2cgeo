@@ -1,24 +1,62 @@
 {% extends "users/base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<style>
+    /* Estilos específicos para a lista de usuários */
+    .lista-usuarios {
+        background-color: #f8f9fa; /* Cor de fundo suave */
+        border-radius: 0.5rem; /* Bordas arredondadas */
+        padding: 2rem; /* Espaçamento interno */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    }
+
+    .lista-usuarios h2 {
+        color: #4b8b3b; /* Cor do título */
+        margin-bottom: 1.5rem; /* Margem inferior */
+        text-align: center; /* Centraliza o texto */
+    }
+
+    .lista-usuarios .table {
+        background-color: #ffffff; /* Fundo branco para a tabela */
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1); /* Sombra leve */
+    }
+
+    .lista-usuarios .table th {
+        background-color: #4b8b3b; /* Cabeçalho verde */
+        color: #ffffff; /* Texto branco */
+    }
+
+    .lista-usuarios .table tbody tr:hover {
+        background-color: #f1f1f1; /* Efeito hover */
+    }
+
+    .lista-usuarios .btn {
+        margin-right: 0.5rem; /* Espaçamento entre botões */
+    }
+</style>
+
+<div class="container mt-4 lista-usuarios">
     <h2>Lista de Usuários</h2>
 
-    <table class="table">
+    <!-- Botão para criar um novo usuário -->
+    <a href="{% url 'create_user' %}" class="btn btn-primary mb-3">Criar Usuário</a>
+
+    <!-- Formulário de busca -->
+    <input type="text" id="searchInput" class="form-control mb-3" placeholder="Buscar usuários" onkeyup="filterUsers()">
+
+    <table class="table table-bordered" id="userTable">
         <thead>
             <tr>
                 <th>Usuário</th>
-                <th>ID</th>
                 <th>Data de Criação</th>
                 <th>Grupos</th>
-                <th>Ações</th> <!-- Coluna para os botões de ação -->
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
                 <tr>
                     <td>{{ user.username }}</td>
-                    <td>{{ user.id }}</td>
                     <td>{{ user.date_joined|date:"d/m/Y" }}</td>
                     <td>
                         {% if user.groups.all %}
@@ -28,28 +66,76 @@
                         {% endif %}
                     </td>
                     <td>
-                        <!-- Botão para Editar -->
                         <a href="{% url 'update_user_groups' user.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        
-                        <!-- Formulário para Deletar -->
-                        <form action="{% url 'delete_user' user.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
-                        </form>
-
-                        <!-- Formulário para Adicionar/Remover Superuser -->
-                        <form action="{% url 'toggle_superuser' user.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            {% if user.is_superuser %}
-                                <button type="submit" class="btn btn-secondary btn-sm">Remover Superuser</button>
-                            {% else %}
-                                <button type="submit" class="btn btn-success btn-sm">Conceder Superuser</button>
-                            {% endif %}
-                        </form>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">Deletar</button>
+                        <button class="btn {% if user.is_superuser %}btn-secondary{% else %}btn-success{% endif %} btn-sm" data-bs-toggle="modal" data-bs-target="#toggleSuperuserModal{{ user.id }}">{% if user.is_superuser %} Remover Superuser {% else %} Conceder Superuser {% endif %}</button>
                     </td>
                 </tr>
+
+                <!-- Modal Deletar -->
+                <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ user.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel{{ user.id }}">Deletar Usuário</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Você tem certeza que deseja deletar o usuário {{ user.username }}?
+                            </div>
+                            <div class="modal-footer">
+                                <form action="{% url 'delete_user' user.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-danger">Deletar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Adicionar/Remover Superuser -->
+                <div class="modal fade" id="toggleSuperuserModal{{ user.id }}" tabindex="-1" aria-labelledby="toggleSuperuserModalLabel{{ user.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="toggleSuperuserModalLabel{{ user.id }}">{% if user.is_superuser %} Remover Superuser {% else %} Conceder Superuser {% endif %}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Você tem certeza que deseja {% if user.is_superuser %} remover {% else %} conceder {% endif %} superusuário ao usuário {{ user.username }}?
+                            </div>
+                            <div class="modal-footer">
+                                <form action="{% url 'toggle_superuser' user.id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">{% if user.is_superuser %} Remover Superuser {% else %} Conceder Superuser {% endif %}</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<script>
+    function filterUsers() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('userTable');
+        const rows = table.getElementsByTagName('tr');
+    
+        for (let i = 1; i < rows.length; i++) { // Começa em 1 para pular o cabeçalho
+            const usernameCell = rows[i].getElementsByTagName('td')[0]; // Apenas a primeira coluna
+            if (usernameCell) {
+                const username = usernameCell.innerText.toLowerCase();
+                rows[i].style.display = username.includes(filter) ? '' : 'none';
+            }
+        }
+    }
+</script>
+
 {% endblock %}

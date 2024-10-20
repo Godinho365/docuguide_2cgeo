@@ -118,7 +118,12 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="title" class="form-label">Título</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
+                        <input type="text" class="form-control" id="title" name="title" required value="{{ form.title.value }}">
+                        {% if form.title.errors %}
+                            <div class="error alert alert-danger mt-2">
+                                {{ form.title.errors|join:', ' }}
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="mb-3">
                         <label for="imagem" class="form-label">Imagem</label>
@@ -131,6 +136,15 @@
         </div>
     </div>
 </div>
+
+<!-- Script para mostrar o modal caso haja erros -->
+<script>
+    $(document).ready(function() {
+        {% if show_modal %}
+            $('#createSectionModal').modal('show');
+        {% endif %}
+    });
+</script>
 
 <!-- CSS Adicional -->
 <style>
@@ -160,5 +174,13 @@
         background-color: #0056b3; /* Cor mais escura para os botões ao passar o mouse */
     }
 </style>
+<script>
+    $(document).ready(function() {
+        {% if show_modal %}
+            $('#createSectionModal').modal('show');
+        {% endif %}
+    });
+</script>
+
 
 {% endblock %}

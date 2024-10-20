@@ -1,23 +1,168 @@
 {% extends "users/base.html" %}
 
 {% block content %}
+<style>
+    /* Estilos gerais */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9; /* Cor de fundo suave */
+    }
+
+    /* Estilos do card principal */
+    .card {
+        margin: auto; /* Centraliza o card */
+        border-radius: 1rem; /* Bordas arredondadas */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+        animation: fadeIn 0.5s forwards; /* Animação de entrada */
+        background-color: white; /* Fundo branco do card */
+        padding: 20px; /* Espaçamento interno */
+        max-width: 1000px; /* Largura máxima do card */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #4B8C2A; /* Verde padrão */
+    }
+
+    /* Estilos do card emblema */
+    .badge-card {
+        display: inline-block; /* Exibir em linha */
+        background-color: #e8f5e9; /* Fundo leve */
+        border: 1px solid #4B8C2A; /* Borda verde */
+        border-radius: 0.5rem; /* Bordas arredondadas */
+        padding: 10px 15px; /* Espaçamento interno */
+        margin-right: 10px; /* Margem à direita */
+        font-weight: bold; /* Negrito para destaque */
+        color: #4B8C2A; /* Cor do texto */
+        font-size: 1.2rem; /* Tamanho do texto */
+    }
+
+    .list-group {
+        border-radius: 8px; /* Bordas arredondadas */
+        overflow: hidden; /* Esconde bordas */
+    }
+
+    .list-group-item {
+        background-color: #ffffff; /* Fundo branco para os itens */
+        border: 1px solid #e7e7e7; /* Borda suave */
+        transition: all 0.3s ease; /* Transição suave */
+        cursor: pointer; /* Cursor de ponteiro */
+        border-radius: 0; /* Remove bordas arredondadas */
+    }
+
+    .list-group-item:hover {
+        background-color: #e8f5e9; /* Fundo ao passar o mouse */
+        transform: translateY(-2px); /* Efeito de elevar o item */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    }
+
+    .no-instructions {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #7f8c8d; /* Cinza claro */
+    }
+
+    .btn-custom {
+        background-color: #4B8C2A; /* Verde claro */
+        color: white; /* Texto branco */
+        border-radius: 0.5rem; /* Bordas arredondadas */
+        width: 48%; /* Botões ocupando quase toda a largura */
+        margin-top: 20px; /* Margem superior */
+    }
+
+    .btn-custom:hover {
+        background-color: #218838; /* Verde mais escuro ao passar o mouse */
+        color: white; /* Texto branco */
+    }
+
+    /* Estilo do label */
+    label {
+        font-weight: bold; /* Negrito para os rótulos */
+        color: #333; /* Cor escura para contraste */
+    }
+
+    /* Efeito de foco nos campos de entrada */
+    input, textarea {
+        transition: border-color 0.3s, box-shadow 0.3s; /* Transição suave */
+    }
+
+    input:focus, textarea:focus {
+        border-color: #28a745; /* Cor verde ao focar */
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Sombra suave ao focar */
+    }
+
+    /* Estilos do grupo de botões */
+    .button-group {
+        display: flex; /* Usando flexbox para alinhar os botões */
+        gap: 10px; /* Espaçamento entre os botões */
+        margin-top: 20px; /* Margem superior para separar dos campos */
+    }
+</style>
+
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Instruções para a Subcategoria: {{ subcategory.name }}</h2>
-            <p>Categoria: {{ subcategory.category.name }}</p>
-            <p>Seção: {{ subcategory.category.section.title }}</p>
-            
-            <div class="list-group mt-4">
-                {% for instruction in instructions %}
-                    <a href="{% url 'detail_instruction' instruction.id %}" class="list-group-item list-group-item-action">
-                        {{ instruction.title }}
-                    </a>
-                {% empty %}
-                    <p>Nenhuma instrução encontrada para esta subcategoria.</p>
-                {% endfor %}
+    <div class="card">
+        <h2>Instruções para a Subcategoria: {{ subcategory.name }}</h2>
+        
+        <!-- Cards emblema para Categoria e Seção -->
+        <div class="badge-card">Categoria: {{ subcategory.category.name }}</div>
+        <div class="badge-card">Seção: {{ subcategory.category.section.title }}</div>
+        
+        <div class="list-group mt-4">
+            {% for instruction in instructions %}
+                <a href="{% url 'detail_instruction' instruction.id %}" class="list-group-item list-group-item-action">
+                    {{ instruction.title }}
+                </a>
+            {% empty %}
+                <p class="no-instructions">Nenhuma instrução encontrada para esta subcategoria.</p>
+            {% endfor %}
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#createInstructionModal">Criar Nova Instrução</button>
+            <a href="{% url 'list_subcategories_for_category' subcategory.category.id %}" class="btn btn-custom">Voltar para Subcategorias</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Criação de Nova Instrução -->
+<div class="modal fade" id="createInstructionModal" tabindex="-1" aria-labelledby="createInstructionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createInstructionModalLabel">Criar Nova Instrução</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'create_instruction' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="instructionTitle" class="form-label">Título da Instrução</label>
+                        <input type="text" class="form-control" id="instructionTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="instructionContent" class="form-label">Conteúdo da Instrução</label>
+                        <textarea class="form-control" id="instructionContent" name="content" rows="4" required></textarea>
+                    </div>
+                    <input type="hidden" name="subcategory" value="{{ subcategory.id }}">
+                    <input type="hidden" name="category" value="{{ subcategory.category.id }}">
+                    <input type="hidden" name="section" value="{{ subcategory.category.section.id }}">
+                    <button type="submit" class="btn btn-primary">Criar Instrução</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}

@@ -29,6 +29,9 @@
                     <div class="mb-3">
                         <strong>Data de criação:</strong> {{ instruction.created_at|date:"d/m/Y H:i" }}
                     </div>
+                    <div class="mb-3">
+                        <strong>Visualizações:</strong> {{ instruction.view_count }}
+                    </div>
 
                     <!-- Conteúdo da instrução com margens ajustadas -->
                     <div class="content mt-4">
@@ -51,9 +54,12 @@
                         </form>
                     </div>
                     {% endif %}
+                    <a href="{% url 'generate_pdf' instruction.pk %}" class="btn btn-primary">Baixar PDF</a>
+                    <!-- Botão para voltar à lista de subcategorias -->
+                    <a href="{% url 'list_subcategories_for_category' instruction.subcategory.category.id %}" class="btn btn-sm" style="background-color: #006400; color: white; border: none;">Voltar à Lista de Subcategorias</a>
                     
-                    <!-- Botão para voltar à lista -->
-                    <a href="{% url 'list_instructions' %}" class="btn btn-sm" style="background-color: #006400; color: white; border: none;">Voltar à Lista</a>
+                    <!-- Botão para voltar à lista de instruções -->
+                    <a href="{% url 'list_instructions' %}" class="btn btn-sm" style="background-color: #006400; color: white; border: none;">Voltar à Lista de Instruções</a>
                 </div>
             </div>
         </div>

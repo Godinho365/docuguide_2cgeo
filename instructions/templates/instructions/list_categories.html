@@ -30,17 +30,29 @@
     .btn:hover {
         background-color: #0056b3; /* Cor mais escura para os botões ao passar o mouse */
     }
+
+    /* Estilo para a badge e botões de ação */
+    .badge {
+        margin-right: 15px; /* Espaçamento à direita da badge */
+    }
+
+    .action-buttons {
+        margin-left: auto; /* Alinha os botões à direita */
+    }
 </style>
 
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
             <div class="card mb-4" style="border: 2px solid #4B8C2A; border-radius: 15px; background-color: #F8F9FA;">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #4B8C2A; color: white;">
+                <div class="card-header d-flex align-items-center" style="background-color: #4B8C2A; color: white;">
                     <h5 class="card-title text-center" style="text-transform: uppercase; margin: 0;">
-                        Categorias da(o) {{ section.title }}
+                        Categorias
                     </h5>
-                    <button class="btn btn-primary" style="background-color: #006400; border-color: #4B8C2A;" data-bs-toggle="modal" data-bs-target="#createCategoryModal">Nova Categoria</button>
+                    <div class="action-buttons d-flex align-items-center">
+                        <button class="btn btn-secondary me-2" onclick="window.location.href='{% url 'list_sections' %}'">Voltar para Seções</button>
+                        <button class="btn btn-primary" style="background-color: #006400; border-color: #4B8C2A;" data-bs-toggle="modal" data-bs-target="#createCategoryModal">Nova Categoria</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -60,54 +72,16 @@
                                         <h5 class="card-title" style="text-transform: uppercase;">
                                             <a href="{% url 'list_subcategories_for_category' category.id %}" style="text-decoration: none; color: inherit;">{{ category.name }}</a>
                                         </h5>
-                                        <p class="card-text">Seção: {{ category.section.title }}</p>
-                                        <div class="d-flex justify-content-center">
+                                        <span class="badge" style="background-color: #4b8c2a; color: white;">{{ category.section.title }}</span> <!-- Badge com margem -->
+                                        <div class="d-flex justify-content-center mt-2">
                                             {% if user.is_superuser %}
-                                            <button class="btn btn-sm" style="background-color: #28A745; color: white; border: none; margin-right: 5px;" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ category.id }}">Editar</button>
+                                            <a href="{% url 'update_categories' category.id %}" class="btn btn-sm" style="background-color: #28A745; color: white; border: none; margin-right: 5px;">Editar</a>
                                             <button class="btn btn-sm" style="background-color: #FF851B; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal{{ category.id }}">Excluir</button>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                           <!-- Modal de Edição -->
-<div class="modal fade" id="editCategoryModal{{ category.id }}" tabindex="-1" aria-labelledby="editCategoryModalLabel{{ category.id }}" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editCategoryModalLabel{{ category.id }}">Editar Categoria</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{% url 'update_categories' category.id %}" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="section_id" value="{{ category.section.id }}"> <!-- Campo oculto para associar à seção -->
-                    <div class="mb-3">
-                        <label for="name{{ category.id }}" class="form-label">Nome da Categoria</label>
-                        <input type="text" class="form-control" id="name{{ category.id }}" name="name" value="{{ category.name }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="imagem{{ category.id }}" class="form-label">Imagem</label>
-                        <input type="file" class="form-control" id="imagem{{ category.id }}" name="imagem">
-                        <small class="form-text text-muted">
-                            Imagem atual: 
-                            {% if category.imagem %}
-                                <img src="{{ category.imagem.url }}" style="max-width: 100px;">
-                            {% else %}
-                                Nenhuma imagem associada.
-                            {% endif %}
-                        </small>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                </form>
-                <div class="response-message mt-3"></div> <!-- Div para exibir mensagens de resposta -->
-            </div>
-        </div>
-    </div>
-</div>
-
-
 
                             <!-- Modal de Exclusão -->
                             <div class="modal fade" id="deleteCategoryModal{{ category.id }}" tabindex="-1" aria-labelledby="deleteCategoryModalLabel{{ category.id }}" aria-hidden="true">
@@ -154,20 +128,19 @@
                         {% csrf_token %}
                         <input type="hidden" name="section" value="{{ section.id }}"> <!-- Campo oculto para associar à seção -->
                         <div class="mb-3">
-                            <label for="newName" class="form-label">Nome da Nova Categoria</label>
+                            <label for="newName" class="form-label">Nome da Categoria</label>
                             <input type="text" class="form-control" id="newName" name="name" required>
                         </div>
                         <div class="mb-3">
-                            <label for="newImagem" class="form-label">Imagem</label>
-                            <input type="file" class="form-control" id="newImagem" name="imagem">
+                            <label for="newImage" class="form-label">Imagem</label>
+                            <input type="file" class="form-control" id="newImage" name="imagem">
                         </div>
                         <button type="submit" class="btn btn-primary">Criar Categoria</button>
                     </form>
+                    <div class="response-message mt-3"></div> <!-- Div para exibir mensagens de resposta -->
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
 {% endblock %}

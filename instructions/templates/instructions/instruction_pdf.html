@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ instruction.title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #333; }
+        .content { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>{{ instruction.title }}</h1>
+    
+    <div class="content">
+        {{ instruction.content|safe }}
+    </div>
+</body>
+</html>

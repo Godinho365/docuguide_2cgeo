@@ -1,63 +1,218 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listar Grupos</title>
-    <!-- Carregar a tag static -->
-    {% load static %}
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">2° CGEO</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' %}">Perfil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_group' %}">Criar Grupo</a>
-                    </li>
-                </ul>
+{% extends "users/base.html" %}
+{% load static %}
+
+{% block title %}Listar Grupos{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos gerais */
+    .listar-grupos {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9; /* Cor de fundo suave */
+        padding: 20px; /* Adicionando um pouco de preenchimento */
+    }
+
+    /* Estilos da navbar */
+    .listar-grupos .navbar {
+        background-color: #28a745; /* Verde padrão */
+    }
+
+    .listar-grupos .navbar-brand, .listar-grupos .nav-link {
+        color: #ffffff; /* Texto branco */
+    }
+
+    .listar-grupos .nav-link:hover {
+        color: #d4edda; /* Verde claro ao passar o mouse */
+    }
+
+    /* Estilos da tabela */
+    .listar-grupos .table {
+        background-color: #ffffff; /* Fundo branco para a tabela */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+        border-radius: 1rem; /* Bordas arredondadas */
+        margin-top: 20px; /* Espaço superior para a tabela */
+    }
+
+    .listar-grupos .table th, .listar-grupos .table td {
+        vertical-align: middle; /* Alinhamento vertical */
+        padding: 10px; /* Adicionando um pouco de preenchimento nas células */
+    }
+
+    /* Estilos do botão */
+    .listar-grupos .btn-primary {
+        background-color: #28a745; /* Verde claro */
+        border-color: #28a745; /* Cor da borda */
+        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
+        border-radius: 0.5rem; /* Bordas arredondadas */
+    }
+
+    .listar-grupos .btn-primary:hover {
+        background-color: #218838; /* Verde mais escuro no hover */
+        border-color: #1e7e34; /* Cor da borda mais escura no hover */
+    }
+
+    .listar-grupos .btn-warning {
+        background-color: #ffc107; /* Amarelo para editar */
+        border-color: #ffc107; /* Cor da borda */
+        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
+        border-radius: 0.5rem; /* Bordas arredondadas */
+    }
+
+    .listar-grupos .btn-warning:hover {
+        background-color: #e0a800; /* Amarelo mais escuro no hover */
+        border-color: #d39e00; /* Cor da borda mais escura no hover */
+    }
+
+    .listar-grupos .btn-danger {
+        background-color: #dc3545; /* Vermelho para excluir */
+        border-color: #dc3545; /* Cor da borda */
+        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
+        border-radius: 0.5rem; /* Bordas arredondadas */
+    }
+
+    .listar-grupos .btn-danger:hover {
+        background-color: #c82333; /* Vermelho mais escuro no hover */
+        border-color: #bd2130; /* Cor da borda mais escura no hover */
+    }
+
+    /* Efeito de hover nas linhas da tabela */
+    .listar-grupos .table tbody tr:hover {
+        background-color: #f1f1f1; /* Cor de fundo ao passar o mouse */
+    }
+
+    /* Estilos do modal */
+    .modal-content {
+        border-radius: 1rem; /* Bordas arredondadas nos modais */
+    }
+</style>
+
+<div class="container listar-grupos">
+    <h2>Listar Grupos</h2>
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createGroupModal">Criar Novo Grupo</button>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td>{{ group.name }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editGroupModal" data-group-id="{{ group.id }}" data-group-name="{{ group.name }}">Editar</button>
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteGroupModal" data-group-id="{{ group.id }}" data-group-name="{{ group.name }}">Excluir</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Criar Grupo -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGroupModalLabel">Criar Novo Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createGroupForm" method="post" action="{% url 'create_group' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="groupName" class="form-label">Nome do Grupo</label>
+                        <input type="text" class="form-control" id="groupName" name="name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Criar</button>
+                </form>
             </div>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <h2>Listar Grupos</h2>
-        <a class="btn btn-primary mb-3" href="{% url 'create_group' %}">Criar Novo Grupo</a>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for group in groups %}
-                <tr>
-                    <td>{{ group.id }}</td>
-                    <td>{{ group.name }}</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm" href="{% url 'edit_group' group.id %}">Editar</a>
-                        <a class="btn btn-danger btn-sm" href="{% url 'delete_group' group.id %}">Excluir</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
+</div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!-- Modal Editar Grupo -->
+<div class="modal fade" id="editGroupModal" tabindex="-1" aria-labelledby="editGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editGroupModalLabel">Editar Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editGroupForm" method="post" action="{% url 'edit_group' 0 %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="editGroupName" class="form-label">Nome do Grupo</label>
+                        <input type="text" class="form-control" id="editGroupName" name="name" required>
+                    </div>
+                    <input type="hidden" id="editGroupId" name="id">
+                    <button type="submit" class="btn btn-warning">Salvar Alterações</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Grupo -->
+<div class="modal fade" id="deleteGroupModal" tabindex="-1" aria-labelledby="deleteGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGroupModalLabel">Excluir Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o grupo <strong id="deleteGroupName"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteGroupForm" method="post" action="{% url 'delete_group' 0 %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="deleteGroupId" name="id">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Preencher os campos do modal de edição
+    var editGroupModal = document.getElementById('editGroupModal');
+    editGroupModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Botão que acionou o modal
+        var groupId = button.getAttribute('data-group-id');
+        var groupName = button.getAttribute('data-group-name');
+
+        // Atualizar o campo do nome e ID
+        var editGroupName = editGroupModal.querySelector('#editGroupName');
+        var editGroupId = editGroupModal.querySelector('#editGroupId');
+        editGroupName.value = groupName;
+        editGroupId.value = groupId;
+
+        // Atualiza a ação do formulário
+        editGroupModal.querySelector('form').action = "{% url 'edit_group' 0 %}".replace('0', groupId);
+    });
+
+    // Preencher os campos do modal de exclusão
+    var deleteGroupModal = document.getElementById('deleteGroupModal');
+    deleteGroupModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Botão que acionou o modal
+        var groupId = button.getAttribute('data-group-id');
+        var groupName = button.getAttribute('data-group-name');
+
+        // Atualizar o nome do grupo que será excluído
+        var deleteGroupName = deleteGroupModal.querySelector('#deleteGroupName');
+        deleteGroupName.textContent = groupName;
+
+        // Atualiza a ação do formulário
+        deleteGroupModal.querySelector('form').action = "{% url 'delete_group' 0 %}".replace('0', groupId);
+    });
+</script>
+{% endblock %}
