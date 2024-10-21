@@ -6,8 +6,8 @@
         <!-- Coluna esquerda para ações administrativas e gerenciamento de estrutura -->
         <div class="col-md-4 mb-3">
             <!-- Card para Ações Administrativas -->
-            <div class="card mb-3 border-2 rounded-3 border-success bg-light">
-                <div class="card-header bg-success text-white text-center text-uppercase">
+            <div class="card mb-3 border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
+                <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
                     <h5 class="card-title mb-0">Ações Administrativas</h5>
                 </div>
                 <div class="card-body">
@@ -49,8 +49,8 @@
             </div>
             {% if user.is_superuser %}
             <!-- Card para Gerenciar Estrutura -->
-            <div class="card border-2 rounded-3 border-success bg-light">
-                <div class="card-header bg-success text-white text-center text-uppercase">
+            <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
+                <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
                     <h5 class="card-title mb-0">Gerenciar Estrutura</h5>
                 </div>
                 <div class="card-body">
@@ -69,7 +69,6 @@
                             Categorias
                         </button>
                         <ul class="dropdown-menu">
-                    
                             <li><a class="dropdown-item" href="{% url 'create_category' %}">Criar Categoria</a></li>
                         </ul>
                     </div>
@@ -78,7 +77,6 @@
                             Subcategorias
                         </button>
                         <ul class="dropdown-menu">
-                            
                             <li><a class="dropdown-item" href="{% url 'create_subcategory' %}">Criar Subcategoria</a></li>
                         </ul>
                     </div>
@@ -91,8 +89,8 @@
             <div class="row">
                 <!-- Card para Informações do Perfil -->
                 <div class="{% if not user.is_superuser %}col-md-6{% else %}col-md-12{% endif %}">
-                    <div class="card border-2 rounded-3 border-success bg-light">
-                        <div class="card-header bg-success text-white text-center text-uppercase">
+                    <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
+                        <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
                             <h5 class="card-title mb-0">Informações do Perfil</h5>
                         </div>
                         <div class="card-body">
@@ -123,8 +121,8 @@
                 </div>
                 <!-- Card para Minhas Instruções -->
                 <div class="col-md-6">
-                    <div class="card mt-3 border-2 rounded-3 border-success bg-light">
-                        <div class="card-header bg-success text-white text-center text-uppercase">
+                    <div class="card mt-3 border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
+                        <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
                             <h5 class="card-title mb-0">Minhas Instruções</h5>
                         </div>
                         <div class="card-body">

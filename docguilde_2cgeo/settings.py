@@ -105,8 +105,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CKEDITOR_UPLOAD_PATH = "images/uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 
-CKEDITOR_CONFIS = {
+CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'Base',
+        'toolbar': 'full',
+        'height': 700,  # Defina a altura desejada em pixels
+        'width': '1100',  # Você pode ajustar a largura também, se necessário
     },
 }
+

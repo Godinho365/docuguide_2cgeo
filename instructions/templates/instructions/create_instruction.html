@@ -8,73 +8,77 @@
     /* Estilos gerais */
     body {
         font-family: 'Arial', sans-serif;
-        background-color: #e5e5e5; /* Cor de fundo suave */
+        background-color: #e5e5e5;
     }
 
     /* Estilos do card */
     .card {
-        border-radius: 0.5rem; /* Bordas arredondadas */
-        background-color: #ffffff; /* Fundo branco para o card */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
-        max-width: 900px; /* Largura máxima do card aumentada */
-        margin: 20px auto; /* Centraliza o card com margem */
-        transition: transform 0.3s, box-shadow 0.3s; /* Transições suaves */
+        border-radius: 0.5rem;
+        background-color: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        max-width: 95%; /* Aumentando a largura máxima para 95% */
+        margin: 20px auto;
+        transition: transform 0.3s, box-shadow 0.3s;
+        width: 95%; /* Define a largura como 95% do contêiner */
     }
 
     /* Efeito de hover no card */
     .card:hover {
-        transform: translateY(-5px); /* Levanta o card no hover */
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2); /* Sombra mais intensa no hover */
+        transform: translateY(-5px);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
     }
 
     /* Estilos do cabeçalho do card */
     .card-header {
-        background-color: #4b8b3b; /* Verde militar */
-        color: #ffffff; /* Texto branco */
-        border-top-left-radius: 0.5rem; /* Bordas arredondadas */
-        border-top-right-radius: 0.5rem; /* Bordas arredondadas */
+        background-color: #4b8b3b;
+        color: #ffffff;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
     }
 
     /* Estilos do botão */
     .btn-primary {
-        background-color: #28a745; /* Verde claro */
-        border-color: #28a745; /* Cor da borda */
-        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
+        background-color: #28a745;
+        border-color: #28a745;
+        transition: background-color 0.3s, border-color 0.3s;
     }
 
-    /* Estilos de hover do botão */
     .btn-primary:hover {
-        background-color: #218838; /* Verde mais escuro no hover */
-        border-color: #1e7e34; /* Cor da borda mais escura no hover */
+        background-color: #218838;
+        border-color: #1e7e34;
     }
 
     .btn-secondary {
-        background-color: #6c757d; /* Cinza para botões secundários */
-        border-color: #6c757d; /* Cor da borda */
-        transition: background-color 0.3s, border-color 0.3s; /* Transições suaves */
+        background-color: #6c757d;
+        border-color: #6c757d;
+        transition: background-color 0.3s, border-color 0.3s;
     }
 
-    /* Estilos de hover do botão secundário */
     .btn-secondary:hover {
-        background-color: #5a6268; /* Cinza mais escuro no hover */
-        border-color: #545b62; /* Cor da borda mais escura no hover */
+        background-color: #5a6268;
+        border-color: #545b62;
     }
 
     /* Títulos */
     .text-uppercase {
-        text-transform: uppercase; /* Texto em maiúsculas */
+        text-transform: uppercase;
     }
 
     /* Estilo do label */
     label {
-        font-weight: bold; /* Negrito para os rótulos */
-        color: #333; /* Cor escura para contraste */
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Ajustar largura dos campos do formulário */
+    .form-control {
+        width: 100%;
     }
 </style>
 
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10 col-sm-12">
+        <div class="col-12"> <!-- Utilizando col-12 para aumentar a largura -->
             <!-- Card para criar nova instrução -->
             <div class="card shadow-sm border-light">
                 <div class="card-header text-center">
@@ -157,7 +161,6 @@
                             text: category.name
                         }));
                     });
-                    // Limpar as subcategorias quando uma nova seção for selecionada
                     $('#id_subcategory').empty().append('<option value="">Selecione uma Subcategoria</option>');
                 }
             });
