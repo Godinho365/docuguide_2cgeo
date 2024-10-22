@@ -4,136 +4,64 @@
 {% block title %}Criar Instrução{% endblock %}
 
 {% block content %}
-<style>
-    /* Estilos gerais */
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #e5e5e5;
-    }
-
-    /* Estilos do card */
-    .card {
-        border-radius: 0.5rem;
-        background-color: #ffffff;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        max-width: 95%; /* Aumentando a largura máxima para 95% */
-        margin: 20px auto;
-        transition: transform 0.3s, box-shadow 0.3s;
-        width: 95%; /* Define a largura como 95% do contêiner */
-    }
-
-    /* Efeito de hover no card */
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Estilos do cabeçalho do card */
-    .card-header {
-        background-color: #4b8b3b;
-        color: #ffffff;
-        border-top-left-radius: 0.5rem;
-        border-top-right-radius: 0.5rem;
-    }
-
-    /* Estilos do botão */
-    .btn-primary {
-        background-color: #28a745;
-        border-color: #28a745;
-        transition: background-color 0.3s, border-color 0.3s;
-    }
-
-    .btn-primary:hover {
-        background-color: #218838;
-        border-color: #1e7e34;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        transition: background-color 0.3s, border-color 0.3s;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-        border-color: #545b62;
-    }
-
-    /* Títulos */
-    .text-uppercase {
-        text-transform: uppercase;
-    }
-
-    /* Estilo do label */
-    label {
-        font-weight: bold;
-        color: #333;
-    }
-
-    /* Ajustar largura dos campos do formulário */
-    .form-control {
-        width: 100%;
-    }
-</style>
-
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12"> <!-- Utilizando col-12 para aumentar a largura -->
-            <!-- Card para criar nova instrução -->
-            <div class="card shadow-sm border-light">
-                <div class="card-header text-center">
-                    <h2 class="text-uppercase mb-0">Nova Instrução</h2>
-                </div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form.media }}
-
-                        <!-- Campo Título -->
-                        <div class="form-group">
-                            <label for="{{ form.title.id_for_label }}">Título</label>
-                            {{ form.title|add_class:"form-control" }}
-                            {{ form.title.errors }}
-                        </div>
-
-                        <!-- Campo Seção com link para criar uma nova seção -->
-                        <div class="form-group">
-                            <label for="{{ form.section.id_for_label }}">Seção</label>
-                            {{ form.section|add_class:"form-control" }}
-                            {{ form.section.errors }}
-                            <a href="{% url 'create_section' %}" class="btn btn-secondary mt-2">Criar Seção</a>
-                        </div>
-
-                        <!-- Campo Categoria com link para criar uma nova categoria -->
-                        <div class="form-group">
-                            <label for="{{ form.category.id_for_label }}">Categoria</label>
-                            {{ form.category|add_class:"form-control" }}
-                            {{ form.category.errors }}
-                            <a href="{% url 'create_category' %}" class="btn btn-secondary mt-2">Criar Categoria</a>
-                        </div>
-
-                        <!-- Campo Subcategoria com link para criar uma nova subcategoria -->
-                        <div class="form-group">
-                            <label for="{{ form.subcategory.id_for_label }}">Subcategoria</label>
-                            {{ form.subcategory|add_class:"form-control" }}
-                            {{ form.subcategory.errors }}
-                            <a href="{% url 'create_subcategory' %}" class="btn btn-secondary mt-2">Criar SubCategoria</a>
-                        </div>
-
-                        <!-- Campo de conteúdo com CKEditor -->
-                        <div class="form-group">
-                            <label for="{{ form.content.id_for_label }}">Conteúdo</label>
-                            {{ form.content|add_class:"form-control" }}
-                            {{ form.content.errors }}
-                        </div>
-
-                        <!-- Botão de submissão -->
-                        <button type="submit" class="btn btn-primary btn-block mt-3">Criar Instrução</button>
-                    </form>
-                </div>
+    <h2 class="mb-4 text-center text-success">Nova Instrução</h2>
+    <form method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow">
+        {% csrf_token %}
+        {{ form.media }}
+        
+        <!-- Exibir mensagens de feedback -->
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
             </div>
+        {% endif %}
+
+        <!-- Campo Título -->
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Título</label>
+            {{ form.title|add_class:"form-control" }}
+            {{ form.title.errors }}
         </div>
-    </div>
+
+        <!-- Campo Seção com link para criar uma nova seção -->
+        <div class="mb-3">
+            <label for="{{ form.section.id_for_label }}" class="form-label">Seção</label>
+            {{ form.section|add_class:"form-control" }}
+            {{ form.section.errors }}
+            <a href="{% url 'create_section' %}" class="btn btn-secondary mt-2">Criar Seção</a>
+        </div>
+
+        <!-- Campo Categoria com link para criar uma nova categoria -->
+        <div class="mb-3">
+            <label for="{{ form.category.id_for_label }}" class="form-label">Categoria</label>
+            {{ form.category|add_class:"form-control" }}
+            {{ form.category.errors }}
+            <a href="{% url 'create_category' %}" class="btn btn-secondary mt-2">Criar Categoria</a>
+        </div>
+
+        <!-- Campo Subcategoria com link para criar uma nova subcategoria -->
+        <div class="mb-3">
+            <label for="{{ form.subcategory.id_for_label }}" class="form-label">Subcategoria</label>
+            {{ form.subcategory|add_class:"form-control" }}
+            {{ form.subcategory.errors }}
+            <a href="{% url 'create_subcategory' %}" class="btn btn-secondary mt-2">Criar Subcategoria</a>
+        </div>
+
+        <!-- Campo de conteúdo com CKEditor -->
+        <div class="mb-3">
+            <label for="{{ form.content.id_for_label }}" class="form-label">Conteúdo</label>
+            {{ form.content|add_class:"form-control" }}
+            {{ form.content.errors }}
+        </div>
+
+        <!-- Botão de submissão -->
+        <button type="submit" class="btn btn-success">
+            Criar Instrução
+        </button>
+    </form>
 </div>
 {% endblock %}
 

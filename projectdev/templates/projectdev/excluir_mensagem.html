@@ -1,0 +1,17 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Excluir Mensagem{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Excluir Mensagem</h3>
+    <p>Tem certeza de que deseja excluir esta mensagem?</p>
+    <p><strong>{{ mensagem.conteudo }}</strong></p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+        <!-- Passando o projeto_id para a URL corretamente -->
+        <a href="{% url 'view_observacoes' projeto_id=mensagem.projeto.id %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

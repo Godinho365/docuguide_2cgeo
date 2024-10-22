@@ -24,7 +24,10 @@ INSTALLED_APPS = [
     'ckeditor',
     'instructions',
     'tasks',
-    'servers'
+    'servers',
+    'insumos',
+    'projectdev',
+
     
 
 ]

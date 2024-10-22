@@ -94,8 +94,18 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"documentation/" %}active{% endif %}" href="{% url 'list_sections' %}">Documentação</a>
                     </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"servers/" %}active{% endif %}" href="{% url 'list_servers' %}">Servidores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"servers/" %}active{% endif %}" href="{% url 'list_insumos' %}">Insumos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"servers/" %}active{% endif %}" href="{% url 'list_projects' %}">Projetos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == request.build_absolute_uri|slice:":-1"|slice:":-12"|add:"servers/" %}active{% endif %}" href="{% url 'list_servers' %}">Impressão</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="instructionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -124,7 +134,7 @@
                 </ul>
                 <form class="d-flex" role="search" action="{% url 'search_instructions' %}" method="get">
                     <div class="input-group">
-                        <input class="form-control" type="search" name="q" placeholder="Buscar" aria-label="Buscar">
+                        <input class="form-control" type="search" name="q" placeholder="Buscar Instruções" aria-label="Buscar">
                         <button class="btn btn-outline-success" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
@@ -160,16 +170,18 @@
                     <p class="text-muted mb-0">© 2024 2° Centro de Geoinformação. Todos os direitos reservados.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-decoration-none me-3">BDGEX</a>
-                    <a href="#" class="text-decoration-none me-3">GITHUB DSG</a>
-                    <a href="#" class="text-decoration-none">INTRANET 2° CGEO</a>
+                    <a href="https://bdgex.eb.mil.br/bdgexapp" class="text-decoration-none me-3" target="_blank" rel="noopener noreferrer">BDGEX</a>
+                    <a href="https://github.com/dsgoficial" class="text-decoration-none me-3" target="_blank" rel="noopener noreferrer">GITHUB DSG</a>
+                    <a href="#" class="text-decoration-none" target="_blank" rel="noopener noreferrer">INTRANET 2° CGEO</a>
                 </div>
+                
             </div>
         </div>
     </footer>
 
     <!-- Bloco de JavaScript adicional -->
     {% block extra_js %}
+    {{ form.media }}  <!-- Isso garante que os scripts e estilos do CKEditor sejam incluídos -->
     {% endblock %}
 
     <!-- Bootstrap JS e dependências -->

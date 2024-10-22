@@ -3,93 +3,13 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <!-- Coluna esquerda para ações administrativas e gerenciamento de estrutura -->
-        <div class="col-md-4 mb-3">
-            <!-- Card para Ações Administrativas -->
-            <div class="card mb-3 border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
-                <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
-                    <h5 class="card-title mb-0">Ações Administrativas</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        {% if user.is_superuser %}
-                        <!-- Dropdown para Grupos -->
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                Gerenciar Grupos
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'list_groups' %}">Listar Grupos</a></li>
-                                <li><a class="dropdown-item" href="{% url 'create_group' %}">Criar Grupo</a></li>
-                            </ul>
-                        </div>
-                        <!-- Dropdown para Usuários -->
-                        <div class="dropdown mt-2">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                Gerenciar Usuários
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'list_users_and_groups' %}">Listar Usuários</a></li>
-                                <li><a class="dropdown-item" href="{% url 'create_user' %}">Criar Usuário</a></li>
-                            </ul>
-                        </div>
-                        {% endif %}
-                        <!-- Dropdown para Tarefas -->
-                        <div class="dropdown mt-2">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                Gerenciar Tarefas
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'task_list' %}">Listar Tarefas</a></li>
-                                <li><a class="dropdown-item" href="{% url 'create_task' %}">Criar Tarefa</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% if user.is_superuser %}
-            <!-- Card para Gerenciar Estrutura -->
-            <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
-                <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
-                    <h5 class="card-title mb-0">Gerenciar Estrutura</h5>
-                </div>
-                <div class="card-body">
-                    <!-- Dropdowns para Gerenciar Seções, Categorias e Subcategorias -->
-                    <div class="dropdown mt-2">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Seções
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'list_sections' %}">Listar Seções</a></li>
-                            <li><a class="dropdown-item" href="{% url 'create_section' %}">Criar Seção</a></li>
-                        </ul>
-                    </div>
-                    <div class="dropdown mt-2">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Categorias
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'create_category' %}">Criar Categoria</a></li>
-                        </ul>
-                    </div>
-                    <div class="dropdown mt-2">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Subcategorias
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'create_subcategory' %}">Criar Subcategoria</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        <!-- Coluna direita para informações do perfil e instruções do usuário -->
-        <div class="{% if user.is_superuser %}col-md-8{% else %}col-md-12{% endif %} mb-3">
+        <!-- Coluna para informações do perfil e instruções do usuário -->
+        <div class="col-md-12 mb-3">
             <div class="row">
+
                 <!-- Card para Informações do Perfil -->
-                <div class="{% if not user.is_superuser %}col-md-6{% else %}col-md-12{% endif %}">
-                    <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa; min-height: 350px;">
                         <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
                             <h5 class="card-title mb-0">Informações do Perfil</h5>
                         </div>
@@ -116,30 +36,144 @@
                                     <p class="text-muted">O usuário não pertence a nenhum grupo.</p>
                                 {% endif %}
                             </div>
+                            <div class="mt-3">
+                                <strong>Projetos:</strong>
+                                {% if user.devproject_set.exists %}
+                                    <div>
+                                        {% for project in user.devproject_set.all %}
+                                            <span class="badge bg-danger me-1">{{ project.nome }}</span> <!-- Alterado para bg-danger -->
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">O usuário não está associado a nenhum projeto.</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Card para Minhas Instruções -->
-                <div class="col-md-6">
-                    <div class="card mt-3 border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa;">
+
+                <!-- Card para Ações Administrativas -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa; min-height: 350px;">
                         <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
-                            <h5 class="card-title mb-0">Minhas Instruções</h5>
+                            <h5 class="card-title mb-0">Ações Administrativas</h5>
                         </div>
                         <div class="card-body">
+                            <div class="d-grid gap-2">
+                                {% if user.is_superuser %}
+                                <!-- Dropdown para Grupos -->
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Gerenciar Grupos
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'list_groups' %}">Listar Grupos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'create_group' %}">Criar Grupo</a></li>
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+                                <!-- Dropdown para Usuários -->
+                                {% if user.is_superuser %}
+                                <div class="dropdown mt-2">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Gerenciar Usuários
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'list_users_and_groups' %}">Listar Usuários</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'create_user' %}">Criar Usuário</a></li>
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+                                <!-- Dropdown para Projetos - disponível para todos os usuários -->
+                                <div class="dropdown mt-2">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Gerenciar Meus Projetos
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'user_project_list' %}">Listar Projetos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'cria_projeto' %}">Criar Projeto</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Dropdown para Tarefas -->
+                                <div class="dropdown mt-2">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Gerenciar Minhas Tarefas
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'task_list' %}">Listar Tarefas</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'create_task' %}">Criar Tarefa</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Novo dropdown para Gerenciar Instruções -->
+                                <div class="dropdown mt-2">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Gerenciar Minhas Instruções
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{% url 'list_user_instructions' %}">Listar Instruções</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'create_instruction' %}">Criar Instrução</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if user.is_superuser %}
+                <!-- Card para Gerenciar Estrutura -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-2 rounded-3" style="border-color: #4B8C2A; background-color: #f8f9fa; min-height: 350px;">
+                        <div class="card-header text-white text-center text-uppercase" style="background-color: #4B8C2A;">
+                            <h5 class="card-title mb-0">Gerenciar Estrutura</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Dropdowns para Gerenciar Seções, Categorias e Subcategorias -->
                             <div class="dropdown mt-2">
-                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    Gerenciar Instruções
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Gerenciar Seções
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{% url 'list_user_instructions' %}">Listar Minhas Instruções</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'create_instruction' %}">Criar Instrução</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'list_sections' %}">Listar Seções</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'create_section' %}">Criar Seção</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown mt-2">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Gerenciar Categorias
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'create_category' %}">Criar Categoria</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown mt-2">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Gerenciar Sub Categorias
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'create_subcategory' %}">Criar Subcategoria</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown mt-2">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Gerenciar Servidores
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'list_servers' %}">Listar Servidores</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'create_server' %}">Criar Servidor</a></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endif %}
+
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}

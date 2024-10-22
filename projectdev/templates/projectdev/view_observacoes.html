@@ -1,0 +1,133 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Mensagens sobre o Projeto {{ projeto.nome }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Cabeçalho do Projeto -->
+    <header class="text-center mb-4">
+        <h2 style="color: #4B8C2A; font-size: 2.5rem;">{{ projeto.nome }}</h2>
+        <p class="lead text-muted">{{ projeto.descricao }}</p>
+    </header>
+
+    <!-- Informações do Projeto em Cartões -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Categoria</h5>
+                    <p class="card-text">{{ projeto.get_categoria_display }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Principal Requisito</h5>
+                    <p class="card-text">{{ projeto.principal_requisito }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Status</h5>
+                    <span class="badge 
+                        {% if projeto.status == 'em_execucao' %}bg-warning
+                        {% elif projeto.status == 'nao_iniciada' %}bg-secondary
+                        {% elif projeto.status == 'bloqueada' %}bg-danger
+                        {% elif projeto.status == 'finalizada' %}bg-success
+                        {% endif %}">
+                        {{ projeto.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Responsável</h5>
+                    <p class="card-text">{{ projeto.responsavel.username }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Dificuldade</h5>
+                    <p class="card-text">{{ projeto.get_dificuldade_display }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Demais Integrantes</h5>
+                    <p class="card-text">
+                        {% if projeto.demais_integrantes.all %}
+                            {{ projeto.demais_integrantes.all|join:", " }}
+                        {% else %}
+                            Nenhum integrante adicional.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <strong>Data de Início:</strong> {{ projeto.data_inicio|date:"d/m/Y" }}<br>
+        <strong>Data de Finalização:</strong> 
+        {% if projeto.data_finalizada %}
+            {{ projeto.data_finalizada|date:"d/m/Y" }}
+        {% else %}
+            Não finalizado.
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <!-- Verifica se o usuário atual é superuser ou está envolvido no projeto -->
+    {% if user.is_superuser or user == projeto.responsavel or user in projeto.demais_integrantes.all %}
+        <!-- Formulário de Mensagem -->
+        <h3 class="mb-4" style="color: #4B8C2A;">Trocar Mensagens</h3>
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form_mensagem.media }}  <!-- Certifique-se de incluir o {{ form_mensagem.media }} -->
+                {{ form_mensagem.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary" style="transition: background-color 0.3s; border-radius: 25px;">Enviar Mensagem</button>
+        </form>
+
+        <!-- Lista de Mensagens -->
+        <h3 style="color: #4B8C2A;">Mensagens</h3>
+        <ul class="list-group mb-4">
+            {% for mensagem in mensagens %}
+                <li class="list-group-item">
+                    <strong>{{ mensagem.integrante.username }}</strong>: {{ mensagem.conteudo|safe }}
+                    <em class="text-muted">- {{ mensagem.data }}</em>
+                    <!-- Verifica se o usuário pode editar ou excluir a mensagem -->
+                    {% if user.is_superuser or user == mensagem.integrante or user == projeto.responsavel %}
+                        <div class="mt-2">
+                            <a href="{% url 'editar_mensagem' mensagem.id %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a href="{% url 'excluir_mensagem' mensagem.id %}" class="btn btn-sm btn-outline-danger" >
+                                <i class="bi bi-trash"></i> Excluir
+                            </a>
+                        </div>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li class="list-group-item">Nenhuma mensagem encontrada.</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-danger">Você não tem permissão para ver as mensagens deste projeto.</p>
+    {% endif %}
+</div>
+{% endblock %}

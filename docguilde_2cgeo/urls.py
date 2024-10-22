@@ -14,6 +14,8 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),  # URLs do CKEditor
     path('tasks/', include('tasks.urls')),
     path('servers/', include('servers.urls')),
+    path('insumos/', include('insumos.urls')),
+    path('projetos/', include('projectdev.urls')),
 ]
 
 # Adiciona suporte para arquivos de mídia em desenvolvimento

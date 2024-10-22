@@ -1,0 +1,12 @@
+<!-- templates/insumos/insumo_confirm_delete.html -->
+{% extends 'users/base.html' %}
+
+{% block content %}
+    <h2>Excluir Insumo</h2>
+    <p>Você tem certeza de que deseja excluir o insumo "{{ insumo.nome }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Excluir</button>
+        <a href="{% url 'list_insumos' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

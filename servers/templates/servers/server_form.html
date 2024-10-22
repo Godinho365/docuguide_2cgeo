@@ -2,11 +2,73 @@
 {% extends 'users/base.html' %}
 
 {% block content %}
-<h2>{% if form.instance.pk %}Editar{% else %}Adicionar{% endif %} Servidor</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<a href="{% url 'list_servers' %}" class="btn btn-secondary">Voltar</a>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center text-success">
+        {% if form.instance.pk %}Editar{% else %}Adicionar{% endif %} Servidor
+    </h2>
+    <form method="post" class="bg-light p-4 rounded shadow">
+        {% csrf_token %}
+        
+        <!-- Exibir mensagens de feedback -->
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Estilizando cada campo do formulário -->
+        <div class="mb-3">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Nome do Servidor</label>
+            {{ form.name }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.ip_address.id_for_label }}" class="form-label">Endereço IP</label>
+            {{ form.ip_address }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.link.id_for_label }}" class="form-label">URL de Acesso</label>
+            {{ form.link }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-label">Nome de Usuário</label>
+            {{ form.username }}
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.password.id_for_label }}" class="form-label">Senha</label>
+            <div class="input-group">
+                {{ form.password }}
+                <button type="button" class="btn btn-outline-secondary" id="passwordToggle" onclick="togglePasswordVisibility()">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Salvar
+            </button>
+            <a href="{% url 'list_servers' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('id_password');
+        const passwordToggle = document.getElementById('passwordToggle');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordToggle.innerHTML = '<i class="bi bi-eye-slash"></i>'; // Ícone de olho fechado
+        } else {
+            passwordInput.type = 'password';
+            passwordToggle.innerHTML = '<i class="bi bi-eye"></i>'; // Ícone de olho aberto
+        }
+    }
+</script>
+
 {% endblock %}

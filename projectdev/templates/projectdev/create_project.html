@@ -1,0 +1,131 @@
+{% extends 'users/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center text-success">Criar Projeto</h2>
+    <form method="post" class="bg-light p-4 rounded shadow" id="projectForm">
+        {% csrf_token %}
+        
+        <!-- Exibir mensagens de feedback -->
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="id_nome" class="form-label">Nome</label>
+            <input type="text" class="form-control" id="id_nome" name="nome" value="{{ form.nome.value|default:'' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_descricao" class="form-label">Descrição</label>
+            <textarea class="form-control" id="id_descricao" name="descricao" rows="4" required>{{ form.descricao.value|default:'' }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_categoria" class="form-label">Categoria</label>
+            <select class="form-control" id="id_categoria" name="categoria" required>
+                <option value="">Selecione uma categoria</option>
+                {% for value, display in form.categoria.field.choices %}
+                    <option value="{{ value }}" {% if value == form.categoria.value %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_principal_requisito" class="form-label">Requisito Principal</label>
+            <input type="text" class="form-control" id="id_principal_requisito" name="principal_requisito" value="{{ form.principal_requisito.value|default:'' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Status</label>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" id="status_em_execucao" name="status" value="em_execucao" {% if form.status.value == 'em_execucao' %}checked{% endif %}>
+                <label class="form-check-label" for="status_em_execucao">Em Execução</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" id="status_nao_iniciada" name="status" value="nao_iniciada" {% if form.status.value == 'nao_iniciada' %}checked{% endif %}>
+                <label class="form-check-label" for="status_nao_iniciada">Não Iniciada</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" id="status_bloqueada" name="status" value="bloqueada" {% if form.status.value == 'bloqueada' %}checked{% endif %}>
+                <label class="form-check-label" for="status_bloqueada">Bloqueada</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" id="status_finalizada" name="status" value="finalizada" {% if form.status.value == 'finalizada' %}checked{% endif %}>
+                <label class="form-check-label" for="status_finalizada">Finalizada</label>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_responsavel" class="form-label">Responsável</label>
+            <select class="form-control" id="id_responsavel" name="responsavel" required>
+                <option value="">Selecione um responsável</option>
+                {% for usuario in form.responsavel.field.queryset %}
+                    <option value="{{ usuario.id }}" {% if usuario.id == form.responsavel.value %}selected{% endif %}>{{ usuario.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_dificuldade" class="form-label">Dificuldade</label>
+            <select class="form-control" id="id_dificuldade" name="dificuldade" required>
+                <option value="">Selecione a dificuldade</option>
+                {% for value, display in form.dificuldade.field.choices %}
+                    <option value="{{ value }}" {% if value == form.dificuldade.value %}selected{% endif %}>{{ display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_demais_integrantes" class="form-label">Demais Integrantes</label>
+            <select class="form-control" id="id_demais_integrantes" name="demais_integrantes" multiple>
+                {% for integrante in form.demais_integrantes.field.queryset %}
+                    <option value="{{ integrante.id }}" {% if integrante.id in form.demais_integrantes.value %}selected{% endif %}>{{ integrante.username }}</option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">Segure Ctrl para selecionar múltiplos integrantes.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_data_inicio" class="form-label">Data de Início</label>
+            <input type="date" class="form-control" id="id_data_inicio" name="data_inicio" value="{{ form.data_inicio.value|date:'Y-m-d' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_data_finalizada" class="form-label">Data Fim</label>
+            <input type="date" class="form-control" id="id_data_finalizada" name="data_finalizada" value="{{ form.data_finalizada.value|date:'Y-m-d' }}">
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Salvar
+            </button>
+            <a href="{% url 'list_projects' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Exemplo de manipulação de eventos para o seletor
+        const categorySelect = document.getElementById('id_categoria');
+        categorySelect.addEventListener('change', function() {
+            alert(`Você selecionou a categoria: ${this.options[this.selectedIndex].text}`);
+        });
+
+        // Seletor de múltiplos integrantes
+        const integrantesSelect = document.getElementById('id_demais_integrantes');
+        integrantesSelect.addEventListener('change', function() {
+            const selectedOptions = Array.from(this.selectedOptions).map(option => option.text).join(', ');
+            console.log(`Integrantes selecionados: ${selectedOptions}`);
+        });
+    });
+</script>
+
+{% endblock %}
